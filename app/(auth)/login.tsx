@@ -59,6 +59,7 @@ const LoginScreen: React.FC = () => {
   const handleLogin = () => {
     if (username === "user" && password === "123456") {
       setError("");
+      router.push("/(tabs)");
     } else {
       setError("Tài khoản hoặc mật khẩu không đúng");
     }
