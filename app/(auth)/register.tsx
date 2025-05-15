@@ -16,7 +16,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
-const RegisterScreen: React.FC = () => {
+export default function RegisterScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const buttonScale = useRef(new Animated.Value(0.8)).current;
@@ -143,7 +143,7 @@ const RegisterScreen: React.FC = () => {
                 <Text className="text-label pb-2">Username</Text>
                 <View className="relative">
                   <TextInput
-                    className="bg-white mx-auto py-4 pl-12 pr-5 rounded-lg shadow-lg shadow-tertiary text-base text-gray-800"
+                    className="bg-white mx-auto py-4 pl-12 pr-5 rounded-lg text-base text-gray-800"
                     style={{ width: width * 0.8 }}
                     placeholder="Username"
                     placeholderTextColor="#9CA3AF"
@@ -178,7 +178,7 @@ const RegisterScreen: React.FC = () => {
                 <Text className="text-label pb-2">Email</Text>
                 <View className="relative">
                   <TextInput
-                    className="bg-white mx-auto py-4 pl-12 pr-5 rounded-lg shadow-lg shadow-tertiary text-base text-gray-800"
+                    className="bg-white mx-auto py-4 pl-12 pr-5 rounded-lg text-base text-gray-800"
                     style={{ width: width * 0.8 }}
                     placeholder="Email"
                     placeholderTextColor="#9CA3AF"
@@ -212,7 +212,7 @@ const RegisterScreen: React.FC = () => {
                 <Text className="text-label pb-2">Mật khẩu</Text>
                 <View className="relative">
                   <TextInput
-                    className="bg-white mx-auto py-4 pl-12 pr-12 rounded-lg shadow-lg shadow-tertiary text-base text-gray-800"
+                    className="bg-white mx-auto py-4 pl-12 pr-12 rounded-lg text-base text-gray-800"
                     style={{ width: width * 0.8 }}
                     placeholder="Mật khẩu"
                     placeholderTextColor="#9CA3AF"
@@ -257,7 +257,7 @@ const RegisterScreen: React.FC = () => {
                 <Text className="text-label pb-2">Xác nhận mật khẩu</Text>
                 <View className="relative">
                   <TextInput
-                    className="bg-white mx-auto py-4 pl-12 pr-12 rounded-lg shadow-lg shadow-tertiary text-base text-gray-800"
+                    className="bg-white mx-auto py-4 pl-12 pr-12 rounded-lg text-base text-gray-800"
                     style={{ width: width * 0.8 }}
                     placeholder="Xác nhận mật khẩu"
                     placeholderTextColor="#9CA3AF"
@@ -325,6 +325,4 @@ const RegisterScreen: React.FC = () => {
       </ScrollView>
     </ImageBackground>
   );
-};
-
-export default RegisterScreen;
+}

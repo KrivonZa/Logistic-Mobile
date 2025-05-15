@@ -16,7 +16,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
-const LoginScreen: React.FC = () => {
+export default function LoginScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const buttonScale1 = useRef(new Animated.Value(0.8)).current;
@@ -95,7 +95,7 @@ const LoginScreen: React.FC = () => {
                 <Text className="text-label pb-2">Username</Text>
                 <View className="relative">
                   <TextInput
-                    className="bg-white mx-auto py-4 pl-12 pr-5 rounded-lg shadow-lg shadow-tertiary text-base text-gray-800"
+                    className="bg-white mx-auto py-4 pl-12 pr-5 rounded-lg text-base text-gray-800"
                     style={{ width: width * 0.8 }}
                     placeholder="Username hoặc Email"
                     placeholderTextColor="#9CA3AF"
@@ -123,7 +123,7 @@ const LoginScreen: React.FC = () => {
                 <Text className="text-label pb-2">Mật khẩu</Text>
                 <View className="relative">
                   <TextInput
-                    className="bg-white mx-auto py-4 pl-12 pr-12 rounded-lg shadow-lg shadow-tertiary text-base text-gray-800"
+                    className="bg-white mx-auto py-4 pl-12 pr-12 rounded-lg text-base text-gray-800"
                     style={{ width: width * 0.8 }}
                     placeholder="Mật khẩu"
                     placeholderTextColor="#9CA3AF"
@@ -208,6 +208,4 @@ const LoginScreen: React.FC = () => {
       </ScrollView>
     </ImageBackground>
   );
-};
-
-export default LoginScreen;
+}
