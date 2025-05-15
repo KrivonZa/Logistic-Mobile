@@ -4,11 +4,10 @@ import { Platform } from "react-native";
 
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 
 export default function TabLayout() {
-
   return (
     <Tabs
       screenOptions={{
@@ -43,7 +42,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "Trang chủ",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="house.fill" color={color} />
           ),
@@ -52,28 +51,28 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: "Explore",
+          title: "Khám phá",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="paperplane.fill" color={color} />
           ),
-          tabBarLabelStyle: {
-            fontWeight: "800",
-          }
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
-          title: "Search",
+          title: "Tìm kiếm",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="magnifyingglass" color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="(profile)"
+        name="profile"
         options={{
-          title: "Profile",
+          headerShown: true,
+          headerTitle: "Thông tin cá nhân",
+          headerTitleAlign: "center",
+          title: "Bạn",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="person.fill" color={color} />
           ),
