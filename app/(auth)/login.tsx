@@ -13,8 +13,26 @@ import {
 } from "react-native";
 import { Link, router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { login } from "@/libs/stores/authentManager/thunk";
+import { useAuth } from "@/libs/hooks/useAuth";
+import { useAppDispatch } from "@/libs/stores";
 
 const { width } = Dimensions.get("window");
+
+const loginSchema = z.object({
+  email: z
+    .string({ required_error: "Vui lòng nhập email" })
+    .nonempty("Vui lòng nhập email")
+    .email("Email không hợp lệ"),
+  password: z
+    .string({ required_error: "Vui lòng nhập mật khẩu" })
+    .nonempty("Vui lòng nhập mật khẩu"),
+});
+
+type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -22,12 +40,23 @@ export default function LoginScreen() {
   const buttonScale1 = useRef(new Animated.Value(0.8)).current;
   const buttonScale2 = useRef(new Animated.Value(0.8)).current;
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const dispatch = useAppDispatch();
+  const { loading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+  });
 
   useEffect(() => {
+    register("email");
+    register("password");
+
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -54,15 +83,13 @@ export default function LoginScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-  }, [fadeAnim, slideAnim, buttonScale1, buttonScale2]);
+  }, []);
 
-  const handleLogin = () => {
-    if (username === "user" && password === "123456") {
-      setError("");
+  const onSubmit = async (data: LoginForm) => {
+    try {
+      await dispatch(login(data)).unwrap();
       router.push("/(tabs)");
-    } else {
-      setError("Tài khoản hoặc mật khẩu không đúng");
-    }
+    } catch (err) {}
   };
 
   return (
@@ -90,19 +117,17 @@ export default function LoginScreen() {
               Đăng nhập
             </Text>
             <View className="w-full gap-y-4">
-              {/* Tên người dùng */}
               <View>
-                <Text className="text-label pb-2">Username</Text>
+                <Text className="text-label pb-2">Email của bạn</Text>
                 <View className="relative">
                   <TextInput
                     className="bg-white mx-auto py-4 pl-12 pr-5 rounded-lg text-base text-gray-800"
                     style={{ width: width * 0.8 }}
-                    placeholder="Username hoặc Email"
+                    placeholder="Email"
                     placeholderTextColor="#9CA3AF"
                     autoCapitalize="none"
                     keyboardType="email-address"
-                    value={username}
-                    onChangeText={setUsername}
+                    onChangeText={(text) => setValue("email", text)}
                   />
                   <MaterialIcons
                     name="email"
@@ -116,9 +141,13 @@ export default function LoginScreen() {
                     }}
                   />
                 </View>
+                {errors.email && (
+                  <Text className="text-red-500 text-sm pt-1">
+                    {errors.email.message}
+                  </Text>
+                )}
               </View>
 
-              {/* Mật khẩu */}
               <View>
                 <Text className="text-label pb-2">Mật khẩu</Text>
                 <View className="relative">
@@ -128,8 +157,7 @@ export default function LoginScreen() {
                     placeholder="Mật khẩu"
                     placeholderTextColor="#9CA3AF"
                     secureTextEntry={!showPassword}
-                    value={password}
-                    onChangeText={setPassword}
+                    onChangeText={(text) => setValue("password", text)}
                   />
                   <MaterialIcons
                     name="lock"
@@ -153,11 +181,13 @@ export default function LoginScreen() {
                     />
                   </TouchableOpacity>
                 </View>
+                {errors.password && (
+                  <Text className="text-red-500 text-sm pt-1">
+                    {errors.password.message}
+                  </Text>
+                )}
               </View>
 
-              {error ? (
-                <Text className="text-red-500 text-center">{error}</Text>
-              ) : null}
               <View className="flex-row justify-end mb-2">
                 <TouchableOpacity>
                   <Text className="text-primary font-medium">
@@ -165,26 +195,26 @@ export default function LoginScreen() {
                   </Text>
                 </TouchableOpacity>
               </View>
+
               <Animated.View style={{ transform: [{ scale: buttonScale1 }] }}>
                 <TouchableOpacity
                   className="bg-primary mx-auto py-4 items-center rounded-full shadow-lg shadow-tertiary"
                   style={{ width: width * 0.7 }}
-                  onPress={handleLogin}
+                  onPress={handleSubmit(onSubmit)}
                 >
                   <Text className="text-lg font-semibold text-white">
                     Đăng nhập
                   </Text>
                 </TouchableOpacity>
               </Animated.View>
+
               <Animated.View style={{ transform: [{ scale: buttonScale2 }] }}>
                 <TouchableOpacity
                   className="bg-white mx-auto py-4 items-center rounded-full shadow-lg shadow-tertiary flex-row justify-center"
                   style={{ width: width * 0.7 }}
                 >
                   <Image
-                    source={{
-                      uri: "https://www.google.com/favicon.ico",
-                    }}
+                    source={{ uri: "https://www.google.com/favicon.ico" }}
                     style={{ width: 20, height: 20, marginRight: 8 }}
                   />
                   <Text className="text-lg font-semibold text-gray-800">
@@ -192,6 +222,7 @@ export default function LoginScreen() {
                   </Text>
                 </TouchableOpacity>
               </Animated.View>
+
               <View className="flex-row justify-center mt-2">
                 <Text className="text-gray-600 font-medium">
                   Chưa có tài khoản?{" "}
