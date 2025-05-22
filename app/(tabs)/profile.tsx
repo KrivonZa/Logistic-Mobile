@@ -1,10 +1,16 @@
-import { Text, View, ScrollView, Image, TouchableOpacity, Alert } from "react-native";
+import {
+  Text,
+  View,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { Link } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useAuth } from "@/libs/context/AuthContext";
 
 export default function ProfileScreen() {
-
   const { logout } = useAuth();
 
   return (
@@ -29,15 +35,17 @@ export default function ProfileScreen() {
 
       <View className="flex-col gap-y-4">
         {/* Thông tin cá nhân */}
-        <TouchableOpacity className="bg-zinc-200 px-4 py-3 rounded-full">
-          <View className="flex-row justify-between items-center">
-            <View className="flex-row items-center gap-x-4">
-              <MaterialIcons name="person" size={26} color="#9CA3AF" />
-              <Text className="text-lg font-medium">Thông tin cá nhân</Text>
+        <Link href="/(profile)" asChild>
+          <TouchableOpacity className="bg-zinc-200 px-4 py-3 rounded-full">
+            <View className="flex-row justify-between items-center">
+              <View className="flex-row items-center gap-x-4">
+                <MaterialIcons name="person" size={26} color="#9CA3AF" />
+                <Text className="text-lg font-medium">Thông tin cá nhân</Text>
+              </View>
+              <MaterialIcons name="chevron-right" size={26} color="#9CA3AF" />
             </View>
-            <MaterialIcons name="chevron-right" size={26} color="#9CA3AF" />
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </Link>
 
         {/* Cài đặt */}
         <Link href="/(profile)/setting" asChild>

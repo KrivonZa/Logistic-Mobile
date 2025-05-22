@@ -13,8 +13,7 @@ export default function StackLayout() {
         },
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Thông tin cá nhân" }} />
-      <Stack.Screen name="setting" options={{ title: "Cài đặt" }} />
+      <Stack.Screen name="index" options={{ title: "Bản đồ" }} />
     </Stack>
   );
 }
