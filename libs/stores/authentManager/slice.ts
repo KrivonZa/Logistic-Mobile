@@ -3,12 +3,10 @@ import { login } from "./thunk";
 
 type stateType = {
   loading: boolean;
-  error: string;
 };
 
 const initialState: stateType = {
   loading: false,
-  error: "",
 };
 
 export const manageAuthenSlice = createSlice({
@@ -25,7 +23,6 @@ export const manageAuthenSlice = createSlice({
       })
       .addCase(login.rejected, (state) => {
         state.loading = false;
-        state.error = "Đăng nhập thất bại";
       });
   },
 });

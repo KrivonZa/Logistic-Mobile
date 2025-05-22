@@ -1,8 +1,12 @@
-import { Text, View, ScrollView, Image, TouchableOpacity } from "react-native";
+import { Text, View, ScrollView, Image, TouchableOpacity, Alert } from "react-native";
 import { Link } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useAuth } from "@/libs/context/AuthContext";
 
 export default function ProfileScreen() {
+
+  const { logout } = useAuth();
+
   return (
     <ScrollView className="py-6 px-6">
       <View className="flex-col items-center gap-y-5 mb-10">
@@ -49,7 +53,15 @@ export default function ProfileScreen() {
         </Link>
 
         {/* Đăng xuất */}
-        <TouchableOpacity className="bg-zinc-200 px-4 py-3 rounded-full">
+        <TouchableOpacity
+          className="bg-zinc-200 px-4 py-3 rounded-full"
+          onPress={() => {
+            Alert.alert("Xác nhận", "Bạn có chắc muốn đăng xuất không?", [
+              { text: "Hủy", style: "cancel" },
+              { text: "Đăng xuất", onPress: logout },
+            ]);
+          }}
+        >
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-x-4">
               <MaterialIcons name="logout" size={26} color="#9CA3AF" />

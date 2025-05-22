@@ -10,14 +10,18 @@ export const login = createAsyncThunk(
       const response = await manageAuthen.login(req);
       const token = response.data?.data.access_token;
       const role = response.data?.data.role;
-      if (token && role) {
-        await SecureStore.setItemAsync("authToken", token);
-        await SecureStore.setItemAsync("role", role);
+
+      const allowedRoles = ["Customer", "Driver"];
+      if (!token || !role || !allowedRoles.includes(role)) {
+        return rejectWithValue("Bạn không có quyền truy cập vào ứng dụng này");
       }
+
+      await SecureStore.setItemAsync("authToken", token);
+      await SecureStore.setItemAsync("role", role);
+
       return response.data;
     } catch (error) {
-      console.log("API error:", error);
-      return rejectWithValue(error);
+      return rejectWithValue("Email hoặc mật khẩu không đúng.");
     }
   }
 );

@@ -10,6 +10,8 @@ import {
   ImageBackground,
   TextInput,
   ScrollView,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Link, router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -17,7 +19,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { login } from "@/libs/stores/authentManager/thunk";
-import { useAuth } from "@/libs/hooks/useAuth";
+import { useAuthen } from "@/libs/hooks/useAuthen";
+import { useAuth } from "@/libs/context/AuthContext";
 import { useAppDispatch } from "@/libs/stores";
 
 const { width } = Dimensions.get("window");
@@ -41,7 +44,8 @@ export default function LoginScreen() {
   const buttonScale2 = useRef(new Animated.Value(0.8)).current;
 
   const dispatch = useAppDispatch();
-  const { loading } = useAuth();
+  const { loading } = useAuthen();
+  const { reloadAuth } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -88,8 +92,11 @@ export default function LoginScreen() {
   const onSubmit = async (data: LoginForm) => {
     try {
       await dispatch(login(data)).unwrap();
+      await reloadAuth();
       router.push("/(tabs)");
-    } catch (err) {}
+    } catch (err: any) {
+      Alert.alert("Lỗi đăng nhập", err);
+    }
   };
 
   return (
@@ -202,9 +209,13 @@ export default function LoginScreen() {
                   style={{ width: width * 0.7 }}
                   onPress={handleSubmit(onSubmit)}
                 >
-                  <Text className="text-lg font-semibold text-white">
-                    Đăng nhập
-                  </Text>
+                  {loading ? (
+                    <ActivityIndicator className="text-xl text-white" />
+                  ) : (
+                    <Text className="text-lg font-semibold text-white">
+                      Đăng nhập
+                    </Text>
+                  )}
                 </TouchableOpacity>
               </Animated.View>
 
