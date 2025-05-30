@@ -23,7 +23,7 @@ export default function ProfileScreen() {
           style={{ width: 150, height: 150 }}
           className="border-2 border-subtle rounded-full"
         />
-        <Text className="text-2xl font-bold">Ông da đen</Text>
+        <Text className="text-2xl font-bold">Bob Smith</Text>
 
         {/* Nâng cấp lên PRO */}
         <TouchableOpacity className="bg-secondary px-10 py-4 rounded-full">

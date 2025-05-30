@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import React from "react";
+import ChatHeader from "@/components/chat/ChatHeader";
 
 export default function StackLayout() {
   return (
@@ -13,8 +14,15 @@ export default function StackLayout() {
         },
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Thông tin cá nhân" }} />
-      <Stack.Screen name="setting" options={{ title: "Cài đặt" }} />
+      <Stack.Screen name="index" options={{ title: "Các tin nhắn" }} />
+      <Stack.Screen
+        name="[id]"
+        options={{
+          title: "Tin nhắn",
+          headerTitleAlign: "left",
+          header: () => <ChatHeader />,
+        }}
+      />
     </Stack>
   );
 }
