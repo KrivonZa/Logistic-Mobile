@@ -53,7 +53,6 @@ export default function MessageList({
   const flatListData: ListItem[] = useMemo(() => {
     const groupedMessages = messages.reduce((acc, msg) => {
       const time = dayjs(msg.createdAt, "DD-MM-YYYY HH:mm", true);
-      console.log(time, msg.createdAt);
       const dateKey = time.format("DD-MM-YYYY");
       if (!acc[dateKey]) acc[dateKey] = [];
       acc[dateKey].push(msg);

@@ -24,7 +24,7 @@ export default function TabLayout() {
             right: 10,
             borderRadius: 30,
             elevation: 10,
-            backgroundColor: "rgba(255, 255, 255, 0.9)",
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
             marginHorizontal: 20,
           },
           default: {
@@ -34,7 +34,7 @@ export default function TabLayout() {
             right: 10,
             borderRadius: 30,
             elevation: 10,
-            backgroundColor: "rgba(255, 255, 255, 0.9)",
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
             marginHorizontal: 20,
           },
         }),
@@ -43,12 +43,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          headerShown: true,
           title: "Trang chủ",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="house.fill" color={color} />
           ),
-          header: () => <IndexHeader />,
         }}
       />
       <Tabs.Screen
