@@ -24,7 +24,7 @@ export default function TabLayout() {
             right: 10,
             borderRadius: 30,
             elevation: 10,
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
             marginHorizontal: 20,
           },
           default: {
@@ -34,7 +34,7 @@ export default function TabLayout() {
             right: 10,
             borderRadius: 30,
             elevation: 10,
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
             marginHorizontal: 20,
           },
         }),

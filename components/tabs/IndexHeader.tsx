@@ -166,7 +166,7 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
               name="search"
               size={24}
               color="#005cb8"
-              className="px-2 border-r-2 border-primary/80"
+              className="px-2"
             />
             <TextInput
               numberOfLines={1}
@@ -177,7 +177,7 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
               name="scan"
               size={24}
               color="#005cb8"
-              className="px-2 border-l-2 border-primary/80"
+              className="px-2 pl-2 border-l-2 border-primary/80"
             />
           </View>
         </Animated.View>

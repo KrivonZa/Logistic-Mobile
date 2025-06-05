@@ -1,63 +1,56 @@
 import { Text, View, ScrollView, Image, TouchableOpacity } from "react-native";
-import { Link } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 
 export default function ProfileScreen() {
-  return (
-    <ScrollView className="py-6 px-6">
-      <View className="flex-col items-center gap-y-5 mb-10">
-        <Image
-          source={{
-            uri: "https://img.freepik.com/free-photo/close-up-upset-american-black-person_23-2148749582.jpg?semt=ais_hybrid&w=740",
-          }}
-          style={{ width: 150, height: 150 }}
-          className="border-2 border-subtle rounded-full"
-        />
-        <Text className="text-2xl font-bold">Bob Smith</Text>
+  const user = {
+    fullName: "Đặng Văn Lâm",
+    email: "lam@example.com",
+    phone: "0987654321",
+    gender: "Nam",
+    birthday: "1995-03-15",
+    joinDate: "2022-01-10",
+    address: "123 Nguyễn Văn Cừ, Quận 5, TP.HCM",
+    avatarUrl: "https://i.pravatar.cc/150",
+  };
 
-        {/* Nâng cấp lên PRO */}
-        <TouchableOpacity className="bg-secondary px-10 py-4 rounded-full">
-          <Text className="text-white text-center font-medium text-lg">
-            Nâng cấp <Text className="font-semibold">PREMIUM</Text>
-          </Text>
-        </TouchableOpacity>
+  const infoItems = [
+    { label: "Email", value: user.email },
+    { label: "Số điện thoại", value: user.phone },
+    { label: "Giới tính", value: user.gender },
+    { label: "Ngày sinh", value: user.birthday },
+    { label: "Ngày tham gia", value: user.joinDate },
+    { label: "Địa chỉ", value: user.address },
+  ];
+
+  return (
+    <ScrollView className="flex-1 bg-white px-6 pt-10">
+      {/* Avatar Section */}
+      <View className="items-center mb-8">
+        <View className="relative">
+          <Image
+            source={{ uri: user.avatarUrl }}
+            className="w-36 h-36 rounded-full border-4 border-white shadow-md"
+          />
+          <TouchableOpacity className="absolute bottom-1 right-1 bg-white p-2 rounded-full shadow">
+            <MaterialIcons name="edit" size={20} color="#2563EB" />
+          </TouchableOpacity>
+        </View>
+        <Text className="mt-4 text-2xl font-bold text-gray-800">{user.fullName}</Text>
+        <Text className="text-base text-gray-500">Thông tin cá nhân</Text>
       </View>
 
-      <View className="flex-col gap-y-6">
-        {/* Thông tin cá nhân */}
-        <TouchableOpacity className="bg-zinc-200 px-3 py-3 rounded-full">
-          <View className="flex-row justify-between items-center">
-            <View className="flex-row items-center gap-x-4">
-              <MaterialIcons name="person" size={32} color="#9CA3AF" />
-              <Text className="text-lg font-medium">Thông tin cá nhân</Text>
-            </View>
-            <MaterialIcons name="chevron-right" size={32} color="#9CA3AF" />
-          </View>
+      {/* Information Section */}
+      <View className="bg-primary rounded-2xl px-5 py-6 shadow-md">
+        <TouchableOpacity className="absolute top-3 right-3 bg-white p-2 rounded-full shadow">
+          <MaterialIcons name="edit" size={20} color="#2563EB" />
         </TouchableOpacity>
 
-        {/* Cài đặt */}
-        <Link href="/(profile)/setting" asChild>
-          <TouchableOpacity className="bg-zinc-200 px-3 py-3 rounded-full">
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center gap-x-4">
-                <MaterialIcons name="settings" size={32} color="#9CA3AF" />
-                <Text className="text-lg font-medium">Cài đặt</Text>
-              </View>
-              <MaterialIcons name="chevron-right" size={32} color="#9CA3AF" />
-            </View>
-          </TouchableOpacity>
-        </Link>
-
-        {/* Đăng xuất */}
-        <TouchableOpacity className="bg-zinc-200 px-3 py-3 rounded-full">
-          <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center gap-x-4">
-              <MaterialIcons name="logout" size={20} color="#9CA3AF" />
-              <Text className="text-lg font-medium">Đăng xuất</Text>
-            </View>
-            <MaterialIcons name="chevron-right" size={20} color="#9CA3AF" />
+        {infoItems.map((item, index) => (
+          <View key={index} className="mb-4 border-b border-white/20 pb-3">
+            <Text className="text-white/80 text-sm font-semibold">{item.label}</Text>
+            <Text className="text-white text-base font-medium">{item.value}</Text>
           </View>
-        </TouchableOpacity>
+        ))}
       </View>
     </ScrollView>
   );

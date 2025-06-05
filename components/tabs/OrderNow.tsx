@@ -123,6 +123,7 @@ const OrderNow: React.FC = () => {
         Đơn hàng hiện tại của bạn
       </Text>
       <FlatList
+        scrollEnabled={false}
         data={orders}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <OrderCard item={item} />}
