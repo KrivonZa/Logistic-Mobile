@@ -40,11 +40,14 @@ export default function RootLayout() {
     <ThemeProvider value={DefaultTheme}>
       <ReduxProvider>
         <AuthProvider>
-          <Stack>
+          <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="(chat)" options={{ headerShown: false }} />
             <Stack.Screen name="(maps)" options={{ headerShown: false }} />
-            <Stack.Screen name="(notification)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="(notification)"
+              options={{ headerShown: false }}
+            />
             <Stack.Screen name="(profile)" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />

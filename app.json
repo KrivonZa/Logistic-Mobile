@@ -12,7 +12,7 @@
       "supportsTablet": true
     },
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/transparent-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#005CB8"
     },
@@ -33,7 +33,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash.png",
+          "image": "./assets/images/transparent-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#005CB8"
