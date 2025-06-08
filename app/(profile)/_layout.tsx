@@ -15,7 +15,7 @@ export default function StackLayout() {
         headerTitleAlign: "center",
         headerTintColor: "#fff",
         headerStyle: {
-          backgroundColor: "#00b3d6",
+          backgroundColor: "#005cb8",
         },
       }}
     >
@@ -38,7 +38,6 @@ export default function StackLayout() {
           ),
         }}
       />
-      <Stack.Screen name="setting" options={{ title: "Cài đặt" }} />
     </Stack>
   );
 }

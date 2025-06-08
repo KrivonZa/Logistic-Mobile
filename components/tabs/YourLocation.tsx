@@ -77,6 +77,9 @@ export default function YourLocation() {
 
   return (
     <View className="flex-1 py-6 px-4 relative">
+      <Text className="text-lg font-bold text-gray-800 mb-6">
+        Vị trí hiện tại
+      </Text>
       <View className="rounded-2xl overflow-hidden relative">
         <MapView
           ref={mapRef}

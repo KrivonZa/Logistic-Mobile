@@ -21,23 +21,27 @@ const HomeScreen = () => {
   const quickActions = [
     {
       key: "book",
-      label: "Đặt vé",
+      label: "Đặt Chuyến",
       image: require("@/assets/images/icons/ticket.png"),
+      onPress: () => console.log("Navigate to Đặt Chuyến"),
     },
     {
       key: "track",
-      label: "Theo dõi đơn",
+      label: "Theo Dõi Đơn",
       image: require("@/assets/images/icons/tracking.png"),
+      onPress: () => console.log("Navigate to Theo Dõi Đơn"),
     },
     {
       key: "nearby",
-      label: "Các chuyến gần đây",
+      label: "Chuyến Gần Đây",
       image: require("@/assets/images/icons/nearby.png"),
+      onPress: () => console.log("Navigate to Chuyến Gần Đây"),
     },
     {
       key: "review",
-      label: "Đánh giá",
+      label: "Đánh Giá",
       image: require("@/assets/images/icons/rating.png"),
+      onPress: () => console.log("Navigate to Đánh Giá"),
     },
   ];
 
@@ -53,7 +57,7 @@ const HomeScreen = () => {
           { useNativeDriver: false }
         )}
       >
-        <View className="mb-6">
+        <View className="mb-2">
           <FlatList
             data={quickActions}
             horizontal
@@ -67,18 +71,17 @@ const HomeScreen = () => {
             renderItem={({ item }) => (
               <TouchableOpacity
                 className="items-center justify-center"
-                onPress={() => {
-                  // TODO
-                }}
+                onPress={item.onPress}
+                activeOpacity={0.7}
               >
-                <View className="bg-white shadow-lg shadow-tertiary p-3 rounded-2xl mt-5 items-center w-32 h-44">
-                  <View className="bg-gray-100 p-3 rounded-full mb-2">
+                <View className="bg-white rounded-2xl p-4 items-center w-36 h-48 shadow-sm border border-gray-200">
+                  <View className="bg-blue-50 p-3.5 rounded-full mb-3 shadow-xs">
                     <Image
                       source={item.image}
-                      style={{ width: 50, height: 50, resizeMode: "contain" }}
+                      style={{ width: 48, height: 48, resizeMode: "contain" }}
                     />
                   </View>
-                  <Text className="text-center text-base text-tertiary font-medium">
+                  <Text className="text-center text-base font-semibold text-gray-800 mt-1">
                     {item.label}
                   </Text>
                 </View>
@@ -87,7 +90,6 @@ const HomeScreen = () => {
           />
         </View>
 
-        {/*Bản đồ */}
         <YourLocation />
         <OrderNow />
       </Animated.ScrollView>

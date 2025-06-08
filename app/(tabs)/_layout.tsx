@@ -12,7 +12,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#00b3d6",
+        tabBarActiveTintColor: "#005cb8",
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
@@ -70,10 +70,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
+          headerStyle: {
+            backgroundColor: "#005cb8",
+          },
           headerShown: true,
-          headerTitle: "Thông tin cá nhân",
+          headerTitle: "Cá nhân",
+          headerTintColor: "#fff",
           headerTitleAlign: "center",
-          title: "Bạn",
+          title: "Cá nhân",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="person.fill" color={color} />
           ),

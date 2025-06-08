@@ -97,7 +97,7 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
         <Animated.View
           style={[
             StyleSheet.absoluteFillObject,
-            { backgroundColor: "#00b3d6", opacity: overlayOpacity },
+            { backgroundColor: "#005cb8", opacity: overlayOpacity },
           ]}
         />
         <View className="flex-row justify-between items-center">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, Text, ActivityIndicator, Alert } from "react-native";
 import MapView, { Marker, Polyline, LatLng } from "react-native-maps";
 import * as Location from "expo-location";
@@ -22,14 +22,19 @@ const LOCATIONS: Point[] = [
   { name: "Ngã Bảy Lý Thái Tổ", latitude: 10.767647, longitude: 106.6744 },
   { name: "BV Phạm Ngọc Thạch", latitude: 10.756092, longitude: 106.665291 },
   { name: "Thuận Kiều Plaza", latitude: 10.754529, longitude: 106.657655 },
-  { name: "Đầu vào CT TP-HCM Trung Lương", latitude: 10.689593, longitude: 106.593092 },
+  {
+    name: "Đầu vào CT TP-HCM Trung Lương",
+    latitude: 10.689593,
+    longitude: 106.593092,
+  },
   { name: "Nút giao Bến Lức", latitude: 10.652673, longitude: 106.47595 },
   { name: "Nút giao Tân An", latitude: 10.547605, longitude: 106.368937 },
   { name: "Nút giao Trung Lương", latitude: 10.441508, longitude: 106.311936 },
 ];
 
+// Tính khoảng cách Haversine
 const getDistance = (p1: Point, p2: Point): number => {
-  const R = 6371e3; // đơn vị mét
+  const R = 6371e3;
   const toRad = (x: number) => (x * Math.PI) / 180;
   const dLat = toRad(p2.latitude - p1.latitude);
   const dLon = toRad(p2.longitude - p1.longitude);
@@ -45,9 +50,13 @@ const getDistance = (p1: Point, p2: Point): number => {
 
 export default function Maps() {
   const [currentLocation, setCurrentLocation] = useState<Point | null>(null);
-  const [routeCoords, setRouteCoords] = useState<LatLng[]>([]);
   const [statusPoints, setStatusPoints] = useState<StatusPoint[]>([]);
+  const [fullRoute, setFullRoute] = useState<LatLng[]>([]);
+  const [renderedCoords, setRenderedCoords] = useState<LatLng[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const indexRef = useRef(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     let locationSubscription: Location.LocationSubscription | null = null;
@@ -55,7 +64,7 @@ export default function Maps() {
     const startTracking = async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert("Quyền truy cập bị từ chối");
+        Alert.alert("Quyền truy cập vị trí bị từ chối");
         setLoading(false);
         return;
       }
@@ -74,28 +83,53 @@ export default function Maps() {
           };
           setCurrentLocation(userPoint);
 
-          // Gọi API lấy tuyến đường
           const allPoints = [userPoint, ...LOCATIONS];
-          const coordsStr = allPoints
-            .map((p) => `${p.longitude},${p.latitude}`)
-            .join(";");
+
+          // Chuẩn bị dữ liệu cho API Google Directions
+          const origin = `${userPoint.latitude},${userPoint.longitude}`;
+          const destination = `${LOCATIONS[LOCATIONS.length - 1].latitude},${
+            LOCATIONS[LOCATIONS.length - 1].longitude
+          }`;
+          const waypoints = LOCATIONS.slice(0, LOCATIONS.length - 1)
+            .map((p) => `${p.latitude},${p.longitude}`)
+            .join("|");
 
           try {
             const res = await axios.get(
-              `https://router.project-osrm.org/route/v1/driving/${coordsStr}?overview=full&geometries=geojson`
+              `https://maps.googleapis.com/maps/api/directions/json`,
+              {
+                params: {
+                  origin,
+                  destination,
+                  waypoints,
+                  key: "GOOGLE_MAP_API_KEY",
+                },
+              }
             );
-            const coords: LatLng[] = res.data.routes[0].geometry.coordinates.map(
-              ([lon, lat]: [number, number]) => ({
-                latitude: lat,
-                longitude: lon,
-              })
+
+            const routes = res.data.routes;
+            if (
+              !routes ||
+              routes.length === 0 ||
+              !routes[0].overview_polyline
+            ) {
+              Alert.alert("Không tìm thấy tuyến đường phù hợp.");
+              console.warn("API response:", res.data);
+              return;
+            }
+
+            const polylinePoints = decodePolyline(
+              routes[0].overview_polyline.points
             );
-            setRouteCoords(coords);
-          } catch {
-            Alert.alert("Không thể tải tuyến đường");
+            setFullRoute(polylinePoints);
+            setRenderedCoords([]);
+            indexRef.current = 0;
+          } catch (error) {
+            Alert.alert("Lỗi khi tải route từ Google Maps");
+            console.error(error);
           }
 
-          // Tìm điểm gần nhất
+          // Tính điểm gần nhất
           let closestIdx = 0;
           let minDist = Infinity;
           for (let i = 0; i < LOCATIONS.length; i++) {
@@ -106,13 +140,13 @@ export default function Maps() {
             }
           }
 
-          // Gán trạng thái cho các điểm
           const updatedStatusPoints: StatusPoint[] = LOCATIONS.map((p, i) => ({
             ...p,
             status:
               i < closestIdx ? "past" : i === closestIdx ? "next" : "upcoming",
           }));
           setStatusPoints(updatedStatusPoints);
+
           setLoading(false);
         }
       );
@@ -121,15 +155,31 @@ export default function Maps() {
     startTracking();
 
     return () => {
-      if (locationSubscription) {
-        locationSubscription.remove();
-      }
+      if (locationSubscription) locationSubscription.remove();
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, []);
 
+  // Animate tuyến đường trong ~3s
+  useEffect(() => {
+    if (fullRoute.length === 0) return;
+
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    const delay = Math.max(10, 3000 / fullRoute.length);
+    intervalRef.current = setInterval(() => {
+      if (indexRef.current >= fullRoute.length) {
+        clearInterval(intervalRef.current!);
+        return;
+      }
+      setRenderedCoords((prev) => [...prev, fullRoute[indexRef.current]]);
+      indexRef.current += 1;
+    }, delay);
+  }, [fullRoute]);
+
   if (loading || !currentLocation) {
     return (
-      <View className="flex-1 justify-center items-center">
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" />
         <Text>Đang tải bản đồ...</Text>
       </View>
@@ -137,7 +187,7 @@ export default function Maps() {
   }
 
   return (
-    <View className="flex-1">
+    <View style={{ flex: 1 }}>
       <MapView
         style={{ flex: 1 }}
         initialRegion={{
@@ -147,7 +197,6 @@ export default function Maps() {
           longitudeDelta: 0.5,
         }}
       >
-        {/* Mark vị trí hiện tại */}
         <Marker
           coordinate={{
             latitude: currentLocation.latitude,
@@ -157,20 +206,11 @@ export default function Maps() {
           pinColor="blue"
         />
 
-        {/* Mark các điểm với trạng thái */}
         {statusPoints.map((loc, index) => (
           <Marker
             key={index}
-            coordinate={{
-              latitude: loc.latitude,
-              longitude: loc.longitude,
-            }}
-            title={`${loc.name} (${loc.status === "past"
-              ? "Đã qua"
-              : loc.status === "next"
-              ? "Sắp tới"
-              : "Chưa tới"
-              })`}
+            coordinate={{ latitude: loc.latitude, longitude: loc.longitude }}
+            title={`${loc.name} (${loc.status})`}
             pinColor={
               loc.status === "past"
                 ? "gray"
@@ -181,13 +221,48 @@ export default function Maps() {
           />
         ))}
 
-        {/* Tuyến đường */}
         <Polyline
-          coordinates={routeCoords}
+          coordinates={renderedCoords}
           strokeWidth={5}
           strokeColor="#005cb8"
         />
       </MapView>
     </View>
   );
+}
+
+// Giải mã Google Polyline (chuỗi thành tọa độ)
+function decodePolyline(encoded: string): LatLng[] {
+  let index = 0,
+    len = encoded.length;
+  let lat = 0,
+    lng = 0;
+  const points: LatLng[] = [];
+
+  while (index < len) {
+    let b,
+      shift = 0,
+      result = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    const dlat = result & 1 ? ~(result >> 1) : result >> 1;
+    lat += dlat;
+
+    shift = 0;
+    result = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    const dlng = result & 1 ? ~(result >> 1) : result >> 1;
+    lng += dlng;
+
+    points.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
+  }
+
+  return points;
 }
