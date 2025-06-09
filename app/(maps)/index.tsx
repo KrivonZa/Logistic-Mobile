@@ -3,7 +3,6 @@ import { View, Text, ActivityIndicator, Alert } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import * as Location from "expo-location";
-import { GOOGLE_MAPS_API_KEY } from '@env';
 
 interface Point {
   name: string;
@@ -99,7 +98,7 @@ export default function Maps() {
           origin={origin}
           destination={destination}
           waypoints={waypoints}
-          apikey={GOOGLE_MAPS_API_KEY}
+          apikey={process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}
           strokeWidth={5}
           strokeColor="blue"
           optimizeWaypoints={false}
