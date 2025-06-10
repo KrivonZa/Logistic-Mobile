@@ -6,7 +6,6 @@ import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { MaterialIcons } from "@expo/vector-icons";
 import TabBarBackground from "@/components/ui/TabBarBackground";
-import IndexHeader from "@/components/tabs/IndexHeader";
 
 export default function TabLayout() {
   return (
@@ -55,15 +54,6 @@ export default function TabLayout() {
           title: "Khám phá",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="paperplane.fill" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="search"
-        options={{
-          title: "Tìm kiếm",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="magnifyingglass" color={color} />
           ),
         }}
       />

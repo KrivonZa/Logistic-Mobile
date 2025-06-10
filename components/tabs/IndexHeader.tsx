@@ -11,7 +11,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 
 type Props = {
   scrollY: Animated.Value;
@@ -26,6 +26,8 @@ const AnimatedImageBackground =
   Animated.createAnimatedComponent(ImageBackground);
 
 const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
+  const router = useRouter();
+
   const headerHeight = scrollY.interpolate({
     inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
     outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
@@ -73,6 +75,15 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
     outputRange: [1, 0],
     extrapolate: "clamp",
   });
+
+  const handleSearchPress = () => {
+    router.push("/(search)");
+  };
+
+  const handleScanPress = () => {
+    console.log("Scan được nhấn!");
+    // router.push("/(scan)");
+  };
 
   return (
     <Animated.View
@@ -161,25 +172,30 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
             opacity: searchBarOpacity,
           }}
         >
-          <View className="flex-row items-center bg-white/80 rounded-full p-2">
-            <Ionicons
-              name="search"
-              size={24}
-              color="#005cb8"
-              className="px-2"
-            />
-            <TextInput
-              numberOfLines={1}
-              className="flex-1 mx-2"
-              placeholder="Tìm kiếm chuyến xe..."
-            />
-            <Ionicons
-              name="scan"
-              size={24}
-              color="#005cb8"
-              className="px-2 pl-2 border-l-2 border-primary/80"
-            />
-          </View>
+          <Link href={"/(search)"}>
+            <View className="flex-row items-center bg-white/80 rounded-full p-2">
+              <Ionicons
+                name="search"
+                size={24}
+                color="#005cb8"
+                className="px-2"
+              />
+              <TextInput
+                numberOfLines={1}
+                className="flex-1 mx-2 pr-2 border-r-2 border-primary/80"
+                placeholder="Tìm kiếm chuyến xe..."
+                editable={false}
+              />
+              <TouchableOpacity onPress={handleScanPress}>
+                <Ionicons
+                  name="scan"
+                  size={24}
+                  color="#005cb8"
+                  className="px-2"
+                />
+              </TouchableOpacity>
+            </View>
+          </Link>
         </Animated.View>
       </AnimatedImageBackground>
     </Animated.View>

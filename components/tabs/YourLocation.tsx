@@ -95,7 +95,7 @@ export default function YourLocation() {
             longitudeDelta: 0.01,
           }}
         >
-          <Marker coordinate={{ latitude, longitude }} title="Vị trí của bạn" />
+          <Marker coordinate={{ latitude, longitude }} title="Vị trí của bạn" pinColor="#FF712C"/>
         </MapView>
         <View className="absolute top-3 right-3 flex-row gap-x-2">
           <TouchableOpacity
@@ -104,12 +104,12 @@ export default function YourLocation() {
           >
             <Ionicons name="locate" size={26} color="#005cb8" />
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => router.push("/(maps)")}
             className="bg-white p-2 rounded-full shadow items-center"
           >
             <Ionicons name="expand" size={26} color="#005cb8" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <View className="absolute -bottom-3 right-2">
           <Image

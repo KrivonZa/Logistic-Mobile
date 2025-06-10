@@ -90,7 +90,7 @@ export default function Maps() {
             key={index}
             coordinate={{ latitude: loc.latitude, longitude: loc.longitude }}
             title={loc.name}
-            pinColor="red"
+            pinColor="#FF712C"
           />
         ))}
 
