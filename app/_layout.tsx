@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import ReduxProvider from "@/app/provider";
 import { AuthProvider } from "@/libs/context/AuthContext";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import "../global.css";
 
@@ -38,25 +39,29 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={DefaultTheme}>
-      <ReduxProvider>
-        <AuthProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(chat)" options={{ headerShown: false }} />
-            <Stack.Screen name="(maps)" options={{ headerShown: false }} />
-            <Stack.Screen name="(search)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="(notification)"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="(profile)" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="dark" />
-        </AuthProvider>
-      </ReduxProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ReduxProvider>
+          <AuthProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="(chat)" options={{ headerShown: false }} />
+              <Stack.Screen name="(maps)" options={{ headerShown: false }} />
+              <Stack.Screen name="(search)" options={{ headerShown: false }} />
+              <Stack.Screen name="(company)" options={{ headerShown: false }} />
+              <Stack.Screen name="(package)" options={{ headerShown: false }} />
+              <Stack.Screen name="(payment)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(notification)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="(profile)" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <StatusBar style="dark" />
+          </AuthProvider>
+        </ReduxProvider>
+      </GestureHandlerRootView>
     </ThemeProvider>
   );
 }

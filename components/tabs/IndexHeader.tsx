@@ -98,9 +98,9 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
       }}
     >
       <AnimatedImageBackground
-        source={{
-          uri: "https://img.freepik.com/premium-photo/light-trails-busy-road-ho-chi-minh-city-vietnam_605022-42728.jpg",
-        }}
+        source={
+          require("@/assets/images/header-image.png")
+        }
         resizeMode="cover"
         className="px-4 pb-4 justify-around flex-1"
         style={{ flex: 1 }}

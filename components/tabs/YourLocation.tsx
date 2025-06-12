@@ -49,7 +49,7 @@ export default function YourLocation() {
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
           },
-          2000
+          1000
         );
       }
     } catch (err) {

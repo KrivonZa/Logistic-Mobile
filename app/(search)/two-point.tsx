@@ -189,7 +189,6 @@ export default function TwoPointSearchScreen(): JSX.Element {
             latitudeDelta: LATITUDE_DELTA,
             longitudeDelta: LONGITUDE_DELTA,
           }}
-          showsUserLocation={true}
           followsUserLocation={true}
         >
           <Marker

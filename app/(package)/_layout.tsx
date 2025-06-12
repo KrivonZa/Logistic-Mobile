@@ -1,13 +1,10 @@
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import React from "react";
 import { TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useAuth } from "@/libs/context/AuthContext";
-import { Alert } from "react-native";
 
 export default function StackLayout() {
-  const { logout } = useAuth();
-
+  const router = useRouter();
   return (
     <Stack
       screenOptions={{
@@ -22,22 +19,21 @@ export default function StackLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: "Thông tin cá nhân",
+          title: "Hàng hóa của bạn",
           headerRight: () => (
             <TouchableOpacity
               onPressIn={() => {
-                Alert.alert("Xác nhận", "Bạn có chắc muốn đăng xuất không?", [
-                  { text: "Hủy", style: "cancel" },
-                  { text: "Đăng xuất", onPress: logout },
-                ]);
+                router.push("/(package)/create");
               }}
               style={{ marginRight: 12 }}
             >
-              <MaterialIcons name="logout" size={24} color="#fff" />
+              <MaterialIcons name="add" size={24} color="#fff" />
             </TouchableOpacity>
           ),
         }}
       />
+      <Stack.Screen name="create" options={{ title: "Tạo hàng hóa" }} />
+      <Stack.Screen name="[id]" options={{ title: "Chi tiết hàng hóa" }} />
     </Stack>
   );
 }

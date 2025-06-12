@@ -91,7 +91,15 @@ export default function NotificationScreen() {
       onPress={() => {
         router.push({
           pathname: "/(notification)/detail",
-          params: item,
+          params: {
+            id: item.id,
+            type: item.type,
+            title: item.title,
+            description: item.description,
+            time: item.time,
+            iconName: item.iconName.toString(), // đảm bảo là string
+            iconColor: item.iconColor,
+          },
         });
       }}
     >

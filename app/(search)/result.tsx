@@ -9,7 +9,7 @@ import {
   Image,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 interface BusTrip {
   id: string;
@@ -25,94 +25,56 @@ const { width } = Dimensions.get("window");
 
 export default function ResultScreen() {
   const { fromLocation, toLocation } = useLocalSearchParams();
+  const router = useRouter();
 
   const dummyBusTrips: BusTrip[] = [
     {
       id: "1",
-      operator: "FUTA Bus Lines",
-      logo: "https://cdn.futabus.vn/img/img_logo.png",
-      departureTime: "08:00 AM",
-      arrivalTime: "01:00 PM",
-      price: 250000,
-      availableSeats: 30,
-    },
-    {
-      id: "2",
       operator: "Phương Trang",
-      logo: "https://futabus.vn/assets/images/phuongtrang_logo.svg",
+      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsM9tWv0skH1wZ9S6ZcI4lPRAF1I-N2E5bRA&s",
       departureTime: "09:30 AM",
       arrivalTime: "02:30 PM",
       price: 265000,
       availableSeats: 25,
     },
     {
-      id: "3",
+      id: "2",
       operator: "Thành Bưởi",
-      logo: "https://thanhbuoibus.com/img/logo.png",
+      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHf8-VhJeSV2SdtLEsmNLxNv3xBjLWkpK_bg&s",
       departureTime: "10:00 AM",
       arrivalTime: "03:00 PM",
       price: 280000,
       availableSeats: 20,
     },
-    {
-      id: "4",
-      operator: "Xe khách chất lượng cao",
-      logo: "https://via.placeholder.com/50/FF712C/FFFFFF?text=XKC",
-      departureTime: "11:00 AM",
-      arrivalTime: "04:00 PM",
-      price: 240000,
-      availableSeats: 40,
-    },
-    {
-      id: "5",
-      operator: "Tuyến đường vàng",
-      logo: "https://via.placeholder.com/50/005cb8/FFFFFF?text=TDV",
-      departureTime: "12:00 PM",
-      arrivalTime: "05:00 PM",
-      price: 270000,
-      availableSeats: 15,
-    },
   ];
 
   const renderBusTripItem = ({ item }: { item: BusTrip }) => (
-    <TouchableOpacity className="bg-white rounded-lg p-4 mb-3 shadow-md border border-gray-100 flex-row items-center">
+    <TouchableOpacity
+      className="bg-white rounded-xl p-4 mb-4 shadow-sm border border-gray-200 flex-row items-center"
+      onPress={() =>
+        router.push({
+          pathname: `/(company)/${item.id}`,
+          params: { title: item.operator },
+        })
+      }
+    >
       <Image
         source={{ uri: item.logo }}
         style={{
-          width: 60,
-          height: 60,
+          width: 50,
+          height: 50,
           borderRadius: 8,
-          marginRight: 12,
           resizeMode: "contain",
+          marginRight: 12,
         }}
       />
       <View className="flex-1">
-        <View className="flex-row justify-between items-center mb-1">
-          <Text className="text-lg font-bold text-primary">
-            {item.operator}
-          </Text>
-          <Text className="text-base font-semibold text-accent">
-            {item.price.toLocaleString("vi-VN")} VNĐ
-          </Text>
-        </View>
-        <View className="flex-row items-center mb-0.5">
-          <MaterialIcons name="schedule" size={16} color="#6B7280" />
-          <Text className="ml-2 text-label text-sm">
-            Giờ đi: {item.departureTime}
-          </Text>
-        </View>
-        <View className="flex-row items-center mb-0.5">
-          <MaterialIcons name="timelapse" size={16} color="#6B7280" />
-          <Text className="ml-2 text-label text-sm">
-            Giờ đến: {item.arrivalTime}
-          </Text>
-        </View>
-        <View className="flex-row items-center">
-          <MaterialIcons name="event-seat" size={16} color="#6B7280" />
-          <Text className="ml-2 text-label text-sm">
-            Ghế trống: {item.availableSeats}
-          </Text>
-        </View>
+        <Text className="text-lg font-bold text-primary mb-1">
+          {item.operator}
+        </Text>
+        <Text className="text-sm font-semibold text-accent">
+          Giá vé từ: {item.price.toLocaleString("vi-VN")} VNĐ
+        </Text>
       </View>
     </TouchableOpacity>
   );
