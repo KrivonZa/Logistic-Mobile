@@ -22,6 +22,7 @@ import { login } from "@/libs/stores/authentManager/thunk";
 import { useAuthen } from "@/libs/hooks/useAuthen";
 import { useAuth } from "@/libs/context/AuthContext";
 import { useAppDispatch } from "@/libs/stores";
+import * as SecureStore from "expo-secure-store";
 
 const { width } = Dimensions.get("window");
 
@@ -90,14 +91,23 @@ export default function LoginScreen() {
   }, []);
 
   const onSubmit = async (data: LoginForm) => {
-    try {
-      await dispatch(login(data)).unwrap();
-      await reloadAuth();
+  try {
+    await dispatch(login(data)).unwrap();
+    await reloadAuth();
+
+    const role = await SecureStore.getItemAsync("role");
+
+    if (role === "Customer") {
       router.push("/(tabs)");
-    } catch (err: any) {
-      Alert.alert("Lỗi đăng nhập", err);
+    } else if (role === "Driver") {
+      router.push("/(driver)");
+    } else {
+      Alert.alert("Lỗi", "Không xác định được vai trò người dùng");
     }
-  };
+  } catch (err: any) {
+    Alert.alert("Lỗi đăng nhập", err);
+  }
+};
 
   return (
     <ImageBackground

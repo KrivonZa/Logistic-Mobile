@@ -15,6 +15,8 @@ const MAPPING = {
   'chevron.right': 'chevron-right',
   'magnifyingglass': 'search',
   'person.fill': "person",
+  'shippingbox.fill': 'inventory',
+  'truck.box.fill': 'local-shipping',
 } as Partial<
   Record<
     import('expo-symbols').SymbolViewProps['name'],

@@ -18,6 +18,7 @@ export const login = createAsyncThunk(
       }
 
       const accountID = parseJwt(token);
+      console.log(token);
       await SecureStore.setItemAsync("authToken", token);
       await SecureStore.setItemAsync("role", role);
       await SecureStore.setItemAsync("accountID", accountID.sub);

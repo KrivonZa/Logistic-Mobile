@@ -10,8 +10,13 @@ export default function Index() {
   useEffect(() => {
     const checkTokenAndNavigate = async () => {
       const storedToken = await SecureStore.getItemAsync("authToken");
+      const role = await SecureStore.getItemAsync("role");
       if (storedToken) {
-        router.replace("/(tabs)");
+        if (role === "Customer") {
+          router.push("/(tabs)");
+        } else if (role === "Driver") {
+          router.push("/(driver)");
+        }
       } else {
         router.replace("/(auth)");
       }
