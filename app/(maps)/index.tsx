@@ -1,109 +1,112 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, Alert } from "react-native";
-import MapView, { Marker } from "react-native-maps";
-import MapViewDirections from "react-native-maps-directions";
-import * as Location from "expo-location";
+import { Text, View, ScrollView, Image, TouchableOpacity } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
-interface Point {
-  name: string;
-  latitude: number;
-  longitude: number;
-}
-
-const LOCATIONS: Point[] = [
-  { name: "Ngã tư Thủ Đức", latitude: 10.849596, longitude: 106.774166 },
-  { name: "Ngã tư Hàng Xanh", latitude: 10.80161, longitude: 106.712158 },
-  { name: "Đài truyền hình HTV", latitude: 10.788228, longitude: 106.699348 },
-  { name: "Chợ hoa Hồ Thị Kỷ", latitude: 10.766504, longitude: 106.678472 },
-  { name: "Ngã Bảy Lý Thái Tổ", latitude: 10.767647, longitude: 106.6744 },
-  { name: "BV Phạm Ngọc Thạch", latitude: 10.756092, longitude: 106.665291 },
-  { name: "Thuận Kiều Plaza", latitude: 10.754529, longitude: 106.657655 },
-  {
-    name: "Đầu vào CT TP-HCM Trung Lương",
-    latitude: 10.689593,
-    longitude: 106.593092,
-  },
-  { name: "Nút giao Bến Lức", latitude: 10.652673, longitude: 106.47595 },
-  { name: "Nút giao Tân An", latitude: 10.547605, longitude: 106.368937 },
-  { name: "Nút giao Trung Lương", latitude: 10.441508, longitude: 106.311936 },
-];
-
-export default function Maps() {
-  const [currentLocation, setCurrentLocation] = useState<Point | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert("Quyền truy cập vị trí bị từ chối");
-        setLoading(false);
-        return;
-      }
-
-      const location = await Location.getCurrentPositionAsync({});
-      setCurrentLocation({
-        name: "Vị trí của bạn",
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-
-      setLoading(false);
-    })();
-  }, []);
-
-  if (loading || !currentLocation) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" />
-        <Text>Đang tải bản đồ...</Text>
-      </View>
-    );
-  }
-
-  const origin = currentLocation;
-  const destination = LOCATIONS[LOCATIONS.length - 1];
-  const waypoints = LOCATIONS.slice(0, -1); // bỏ điểm cuối
+export default function ProfileScreen() {
+  const user = {
+    fullName: "Đặng Văn Lâm",
+    email: "lam@example.com",
+    phone: "0987654321",
+    gender: "Nam",
+    birthday: "1995-03-15",
+    address:
+      "123 Nguyễn Văn Cừ, Phường 5, Quận 5, Thành phố Hồ Chí Minh, Việt Nam, Chung cư ABC, Tầng 10, Căn hộ 101.",
+    avatarUrl: "https://i.pravatar.cc/150",
+  };
 
   return (
-    <View style={{ flex: 1 }}>
-      <MapView
-        style={{ flex: 1 }}
-        initialRegion={{
-          latitude: origin.latitude,
-          longitude: origin.longitude,
-          latitudeDelta: 0.3,
-          longitudeDelta: 0.3,
-        }}
-      >
-        <Marker
-          coordinate={{
-            latitude: origin.latitude,
-            longitude: origin.longitude,
-          }}
-          title={origin.name}
-          pinColor="blue"
-        />
-
-        {LOCATIONS.map((loc, index) => (
-          <Marker
-            key={index}
-            coordinate={{ latitude: loc.latitude, longitude: loc.longitude }}
-            title={loc.name}
-            pinColor="#FF712C"
+    <ScrollView className="flex-1 bg-white pt-8">
+      <View className="px-5 pb-6 items-center border-b border-gray-100 bg-white">
+        <View className="relative mb-4">
+          <Image
+            source={{ uri: user.avatarUrl }}
+            className="w-32 h-32 rounded-full border-4 border-primary"
           />
-        ))}
+          <TouchableOpacity
+            className="absolute bottom-0 right-0 bg-primary p-2 rounded-full border-2 border-white shadow"
+            onPress={() => console.log("Edit avatar")}
+          >
+            <MaterialIcons name="camera-alt" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
+        <Text className="text-2xl font-bold text-label mb-1">
+          {user.fullName}
+        </Text>
+        <Text className="text-base text-gray-500">Thông tin cá nhân</Text>
+      </View>
 
-        <MapViewDirections
-          origin={origin}
-          destination={destination}
-          waypoints={waypoints}
-          apikey={process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}
-          strokeWidth={5}
-          strokeColor="blue"
-          optimizeWaypoints={false}
-        />
-      </MapView>
-    </View>
+      <View className="px-5 py-6">
+        <TouchableOpacity
+          className="absolute top-4 right-4 bg-gray-100 p-2 rounded-full shadow-sm"
+          onPress={() => console.log("Edit user info")}
+        >
+          <MaterialIcons name="edit" size={20} color={"#005cb8"} />
+        </TouchableOpacity>
+
+        <Text className="text-xl font-bold text-label mb-5">
+          Chi tiết tài khoản
+        </Text>
+
+        <View className="flex-row items-center mb-4 p-4 bg-gray-100 rounded-lg shadow-xs">
+          <MaterialIcons name="email" size={24} color={"#005cb8"} />
+          <View className="ml-4 flex-1">
+            <Text className="text-sm font-semibold text-gray-700">Email</Text>
+            <Text className="text-base text-label">{user.email}</Text>
+          </View>
+        </View>
+
+        <View className="flex-row items-center mb-4 p-4 bg-gray-100 rounded-lg shadow-xs">
+          <MaterialIcons name="phone" size={24} color={"#005cb8"} />
+          <View className="ml-4 flex-1">
+            <Text className="text-sm font-semibold text-gray-700">
+              Số điện thoại
+            </Text>
+            <Text className="text-base text-label">{user.phone}</Text>
+          </View>
+        </View>
+
+        <View className="flex-row items-center mb-4 p-4 bg-gray-100 rounded-lg shadow-xs">
+          <MaterialIcons name="person" size={24} color={"#005cb8"} />
+          <View className="ml-4 flex-1">
+            <Text className="text-sm font-semibold text-gray-700">
+              Giới tính
+            </Text>
+            <Text className="text-base text-label">{user.gender}</Text>
+          </View>
+        </View>
+
+        <View className="flex-row items-center mb-4 p-4 bg-gray-100 rounded-lg shadow-xs">
+          <MaterialIcons name="cake" size={24} color={"#005cb8"} />
+          <View className="ml-4 flex-1">
+            <Text className="text-sm font-semibold text-gray-700">
+              Ngày sinh
+            </Text>
+            <Text className="text-base text-label">{user.birthday}</Text>
+          </View>
+        </View>
+
+        <View className="flex-row items-start mb-4 p-4 bg-gray-100 rounded-lg shadow-xs">
+          <MaterialIcons
+            name="location-on"
+            size={24}
+            color={"#005cb8"}
+            className="mr-4"
+          />
+          <View className="flex-1">
+            <Text className="text-sm font-semibold text-gray-700">Địa chỉ</Text>
+            <Text className="text-base text-label">{user.address}</Text>
+          </View>
+        </View>
+
+        <View className="my-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <Text className="text-base font-semibold text-blue-700 mb-2">
+            Lưu ý quan trọng:
+          </Text>
+          <Text className="text-sm text-blue-600">
+            Mọi thông tin cá nhân của bạn đều được bảo mật. Vui lòng liên hệ bộ
+            phận hỗ trợ nếu có bất kỳ thắc mắc nào.
+          </Text>
+        </View>
+      </View>
+    </ScrollView>
   );
 }

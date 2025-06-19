@@ -3,205 +3,209 @@ import {
   Text,
   View,
   TextInput,
-  TouchableOpacity,
+  ScrollView,
   StatusBar,
   ActivityIndicator,
   Alert,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, Polyline } from "react-native-maps";
+import axios from "axios";
+import polyline from "@mapbox/polyline";
 import * as Location from "expo-location";
-import { useLocalSearchParams, useRouter } from "expo-router";
-
-interface LocationCoords {
-  latitude: number;
-  longitude: number;
-  altitude: number | null;
-  accuracy: number | null;
-  altitudeAccuracy: number | null;
-  heading: number | null;
-  speed: number | null;
-}
+import { useLocalSearchParams } from "expo-router";
+import { Picker } from "@react-native-picker/picker";
 
 const { width, height } = Dimensions.get("window");
+const LATITUDE_DELTA = 0.01;
+const LONGITUDE_DELTA = LATITUDE_DELTA * (width / height);
+
+interface LatLng {
+  latitude: number;
+  longitude: number;
+}
 
 export default function TwoPointSearchScreen(): JSX.Element {
-  const { destinationQuery } = useLocalSearchParams();
-  const destination = Array.isArray(destinationQuery)
-    ? destinationQuery[0]
-    : destinationQuery || "";
+  const { lat, lng, description } = useLocalSearchParams();
 
-  const [destinationText, setDestinationText] = useState<string>(destination);
-  const router = useRouter();
+  const [currentCoords, setCurrentCoords] = useState<LatLng | null>(null);
+  const [routeCoords, setRouteCoords] = useState<LatLng[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentAddress, setCurrentAddress] = useState("Đang lấy vị trí...");
+  const [maxDistance, setMaxDistance] = useState("10");
 
-  const [currentLocation, setCurrentLocation] = useState<LocationCoords | null>(
-    null
-  );
-  const [currentLocationAddress, setCurrentLocationAddress] =
-    useState<string>("Đang lấy vị trí...");
-  const [loadingLocation, setLoadingLocation] = useState<boolean>(true);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const destinationCoords: LatLng = {
+    latitude: parseFloat(lat as string),
+    longitude: parseFloat(lng as string),
+  };
 
-  const LATITUDE_DELTA = 0.01;
-  const LONGITUDE_DELTA = LATITUDE_DELTA * (width / height);
+  const fetchRoute = async (from: LatLng, to: LatLng) => {
+    try {
+      const dirRes = await axios.get("https://rsapi.goong.io/Direction", {
+        params: {
+          origin: `${from.latitude},${from.longitude}`,
+          destination: `${to.latitude},${to.longitude}`,
+          vehicle: "car",
+          api_key: process.env.EXPO_PUBLIC_GOONG_MAPS_API_KEY,
+        },
+      });
+
+      const points = dirRes.data.routes[0]?.overview_polyline?.points;
+      if (!points) throw new Error("Không có dữ liệu tuyến đường.");
+
+      const decoded = polyline.decode(points).map(([lat, lng]) => ({
+        latitude: lat,
+        longitude: lng,
+      }));
+      setRouteCoords(decoded);
+    } catch (error) {
+      console.error("Lỗi vẽ tuyến đường:", error);
+      Alert.alert("Lỗi", "Không thể lấy tuyến đường. Vui lòng thử lại.");
+    }
+  };
 
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        setErrorMsg("Quyền truy cập vị trí bị từ chối.");
-        setLoadingLocation(false);
-        Alert.alert(
-          "Lỗi",
-          "Ứng dụng cần quyền truy cập vị trí để hiển thị bản đồ."
-        );
+        Alert.alert("Lỗi", "Cần quyền truy cập vị trí.");
+        setLoading(false);
         return;
       }
 
-      try {
-        let locationResult = await Location.getCurrentPositionAsync({});
-        setCurrentLocation(locationResult.coords);
+      const location = await Location.getCurrentPositionAsync();
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+      setCurrentCoords(coords);
 
-        let geocode = await Location.reverseGeocodeAsync({
-          latitude: locationResult.coords.latitude,
-          longitude: locationResult.coords.longitude,
-        });
+      const res = await axios.get("https://rsapi.goong.io/Geocode", {
+        params: {
+          latlng: `${coords.latitude},${coords.longitude}`,
+          api_key: process.env.EXPO_PUBLIC_GOONG_MAPS_API_KEY,
+        },
+      });
 
-        if (geocode && geocode.length > 0) {
-          const address = geocode[0];
-          const fullAddress = [
-            address.name,
-            address.street,
-            address.district,
-            address.city,
-            address.region,
-            address.country,
-          ]
-            .filter(Boolean)
-            .join(", ");
-          setCurrentLocationAddress(fullAddress || "Vị trí hiện tại");
-        } else {
-          setCurrentLocationAddress("Vị trí hiện tại");
-        }
-        setLoadingLocation(false);
-      } catch (error) {
-        setErrorMsg("Không thể lấy vị trí hiện tại. Vui lòng kiểm tra GPS.");
-        setLoadingLocation(false);
-        Alert.alert(
-          "Lỗi",
-          "Không thể lấy vị trí hiện tại của bạn. Vui lòng bật GPS và thử lại."
-        );
-      }
+      const address = res.data?.results?.[0]?.formatted_address || "Vị trí hiện tại";
+      setCurrentAddress(address);
+
+      await fetchRoute(coords, destinationCoords);
+      setLoading(false);
     })();
   }, []);
 
-  const handleContinue = () => {
-    if (!currentLocation) {
-      Alert.alert("Lỗi", "Không thể xác định vị trí hiện tại của bạn.");
-      return;
-    }
-    if (!destinationText.trim()) {
-      Alert.alert("Thông báo", "Vui lòng nhập điểm đến.");
-      return;
-    }
-
-    router.push({
-      pathname: "/(search)/result",
-      params: {
-        fromLocation: currentLocationAddress,
-        toLocation: destinationText,
-      },
-    });
-  };
-
-  if (loadingLocation) {
+  if (loading || !currentCoords) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" color="#005cb8" />
-        <Text className="mt-4 text-label">Đang tải vị trí...</Text>
-      </View>
-    );
-  }
-
-  if (errorMsg || !currentLocation) {
-    return (
-      <View className="flex-1 items-center justify-center bg-white p-4">
-        <MaterialIcons name="error-outline" size={48} color="red" />
-        <Text className="mt-4 text-lg text-label text-center">
-          {errorMsg || "Không thể lấy được vị trí."}
-        </Text>
-        <Text className="mt-2 text-gray-500 text-center">
-          Vui lòng cấp quyền truy cập vị trí và thử lại.
-        </Text>
+        <Text className="mt-4 text-label">Đang tải bản đồ...</Text>
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-white">
-      <StatusBar barStyle="dark-content" backgroundColor="#F9FAFB" />
-
-      <View className="p-4 bg-primary border-b border-gray-200 shadow-sm">
-        <Text className="text-xl font-bold text-white mb-4">Chọn điểm đến</Text>
-
-        <View className="flex-row items-center w-full bg-white rounded-lg px-4 py-3 mb-3 shadow-md border border-gray-100">
-          <MaterialIcons name="my-location" size={20} color="#005cb8" />
+    <View style={{ flex: 1 }}>
+      <StatusBar barStyle="dark-content" />
+      <View style={{ padding: 16, backgroundColor: "#005cb8" }}>
+        <Text style={{ color: "white", marginBottom: 4 }}>Từ</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ backgroundColor: "white", borderRadius: 8, marginBottom: 8 }}
+        >
           <TextInput
-            className="flex-1 ml-3 text-label text-base font-semibold"
-            value={currentLocationAddress}
             editable={false}
+            selectTextOnFocus={false}
+            caretHidden={true}
+            value={currentAddress}
+            style={{ padding: 12, fontSize: 16, minWidth: "100%" }}
+            multiline={false}
+            numberOfLines={1}
           />
+        </ScrollView>
+
+        <Text style={{ color: "white", marginBottom: 4 }}>Đến</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ backgroundColor: "white", borderRadius: 8, marginBottom: 8 }}
+        >
+          <TextInput
+            editable={false}
+            selectTextOnFocus={false}
+            caretHidden={true}
+            value={description as string}
+            style={{ padding: 12, fontSize: 16, minWidth: "100%" }}
+            multiline={false}
+            numberOfLines={1}
+          />
+        </ScrollView>
+
+        <Text style={{ color: "white", marginBottom: 4 }}>
+          Chọn khoảng cách tối đa (km)
+        </Text>
+        <View
+          style={{
+            backgroundColor: "white",
+            borderRadius: 8,
+            marginBottom: 12,
+            overflow: "hidden",
+          }}
+        >
+          <Picker
+            selectedValue={maxDistance}
+            onValueChange={(itemValue) => setMaxDistance(itemValue)}
+          >
+            <Picker.Item label="5 km" value="5" />
+            <Picker.Item label="10 km" value="10" />
+            <Picker.Item label="15 km" value="15" />
+            <Picker.Item label="20 km" value="20" />
+            <Picker.Item label="30 km" value="30" />
+            <Picker.Item label="50 km" value="50" />
+          </Picker>
         </View>
 
-        <TouchableOpacity className="flex-row items-center w-full bg-white rounded-lg px-4 py-3 mb-4 shadow-md border border-gray-100">
-          <MaterialIcons name="location-on" size={20} color="#FF712C" />
-          <TextInput
-            className="flex-1 ml-3 text-label text-base"
-            placeholder="Điểm đến của bạn..."
-            placeholderTextColor="#6B7280"
-            value={destinationText}
-            onChangeText={setDestinationText}
-          />
-        </TouchableOpacity>
-
         <TouchableOpacity
-          className="w-full bg-secondary py-4 rounded-lg items-center justify-center shadow-lg"
-          onPress={handleContinue}
+          onPress={() => {
+            if (currentCoords && destinationCoords) {
+              console.log("====== Tìm kiếm nhà xe ======");
+              console.log("Vị trí hiện tại:", currentCoords);
+              console.log("Điểm đến:", destinationCoords);
+              console.log("Khoảng cách tối đa:", maxDistance, "km");
+              Alert.alert("Tìm kiếm đã được gửi!", "Xem kết quả trong console.");
+            } else {
+              Alert.alert("Thiếu thông tin", "Vui lòng chờ tải xong dữ liệu.");
+            }
+          }}
+          style={{
+            backgroundColor: "#FF712C",
+            padding: 14,
+            borderRadius: 8,
+            alignItems: "center",
+            marginBottom: 12,
+          }}
         >
-          <Text className="text-white text-lg font-semibold">Tiếp tục</Text>
+          <Text style={{ color: "white", fontWeight: "bold" }}>Tìm chuyến xe</Text>
         </TouchableOpacity>
       </View>
 
-      <View className="flex-1 bg-white items-center justify-center">
-        <MapView
-          style={{
-            width: "100%",
-            height: "100%",
-            borderRadius: 12,
-            overflow: "hidden",
-            borderWidth: 1,
-            borderColor: "#E5E7EB",
-          }}
-          initialRegion={{
-            latitude: currentLocation.latitude,
-            longitude: currentLocation.longitude,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
-          }}
-          followsUserLocation={true}
-        >
-          <Marker
-            coordinate={{
-              latitude: currentLocation.latitude,
-              longitude: currentLocation.longitude,
-            }}
-            title="Vị trí hiện tại"
-            description="Bạn đang ở đây"
-            pinColor="#FF712C"
-          />
-        </MapView>
-      </View>
+      <MapView
+        style={{ flex: 1 }}
+        initialRegion={{
+          latitude: currentCoords.latitude,
+          longitude: currentCoords.longitude,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        }}
+      >
+        <Marker coordinate={currentCoords} title="Vị trí hiện tại" />
+        <Marker coordinate={destinationCoords} title="Điểm đến" pinColor="orange" />
+        {routeCoords.length > 0 && (
+          <Polyline coordinates={routeCoords} strokeColor="#1e88e5" strokeWidth={5} />
+        )}
+      </MapView>
     </View>
   );
 }
