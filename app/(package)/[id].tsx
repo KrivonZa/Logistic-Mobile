@@ -2,6 +2,9 @@ import { View, Text, ScrollView, Image, TouchableOpacity, StatusBar } from "reac
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAppDispatch } from "@/libs/stores";
+import { getPackageById } from "@/libs/stores/packageManager/thunk";
+import { usePackage } from "@/libs/hooks/usePackage";
 
 interface Item {
   id: string;
@@ -25,35 +28,27 @@ interface DetailRowProps {
   value: string;
 }
 
-const allItems: Item[] = [
-  {
-    id: "SP001",
-    name: "Tủ lạnh Samsung Inverter",
-    description: "Tủ lạnh 2 cánh, dung tích 300L, tiết kiệm điện năng. Model RT38K50822C/SV, công nghệ Digital Inverter giúp hoạt động êm ái, bền bỉ và giảm thiểu tiếng ồn. Thiết kế sang trọng, phù hợp mọi không gian bếp hiện đại.",
-    image: "https://cdn.nguyenkimmall.com/images/detailed/666/10046329-tu-lanh-samsung-inverter-380l-rt38k50822c-sv-2.jpg",
-    status: "draft",
-    category: "Điện lạnh",
-    weight: "70 kg",
-    dimensions: "60 x 65 x 170 cm",
-    price: "12.500.000 VNĐ",
-    origin: "Việt Nam",
-    warranty: "24 tháng",
-    createdAt: "2024-05-10T10:00:00Z",
-    updatedAt: "2024-06-01T14:30:00Z",
-  },
-];
-
-type Navigation = ReturnType<typeof useNavigation>;
-
 export default function ItemDetailScreen() {
-  const navigation = useNavigation<Navigation>();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const navigation = useNavigation();
+  const { id, packageImage } = useLocalSearchParams<{ id: string; packageImage?: string }>();
+  const dispatch = useAppDispatch();
+  const { packageDetail } = usePackage(); // Giả sử bạn có selector để lấy package chi tiết
   const [item, setItem] = useState<Item | null>(null);
 
   useEffect(() => {
-    const foundItem = allItems.find((i) => i.id === id);
-    setItem(foundItem);
-  }, [id, navigation]);
+    if (id) {
+      dispatch(getPackageById(id)); // Gọi API hoặc thunk để lấy thông tin package
+    }
+  }, [id, dispatch]);
+
+  useEffect(() => {
+    if (packageDetail) {
+      setItem({
+        ...packageDetail,
+        image: packageImage || packageDetail.image || "", // Ưu tiên packageImage từ params
+      });
+    }
+  }, [packageDetail, packageImage]);
 
   if (!item) {
     return (
