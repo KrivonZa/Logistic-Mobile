@@ -49,11 +49,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="order"
         options={{
-          title: "Khám phá",
+          title: "Tất cả đơn",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
+            <IconSymbol size={28} name="receipt.fill" color={color} />
           ),
         }}
       />

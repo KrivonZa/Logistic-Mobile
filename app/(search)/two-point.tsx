@@ -14,8 +14,12 @@ import MapView, { Marker, Polyline } from "react-native-maps";
 import axios from "axios";
 import polyline from "@mapbox/polyline";
 import * as Location from "expo-location";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
+import { useAppDispatch } from "@/libs/stores";
+import { useRoute } from "@/libs/hooks/useRoute";
+import { findNearest } from "@/libs/stores/routeManager/thunk";
+import { FindNearestWaypointsRequest } from "@/libs/types/route";
 
 const { width, height } = Dimensions.get("window");
 const LATITUDE_DELTA = 0.01;
@@ -31,9 +35,12 @@ export default function TwoPointSearchScreen(): JSX.Element {
 
   const [currentCoords, setCurrentCoords] = useState<LatLng | null>(null);
   const [routeCoords, setRouteCoords] = useState<LatLng[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadings, setLoadings] = useState(true);
   const [currentAddress, setCurrentAddress] = useState("Đang lấy vị trí...");
   const [maxDistance, setMaxDistance] = useState("10");
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { loading } = useRoute();
 
   const destinationCoords: LatLng = {
     latitude: parseFloat(lat as string),
@@ -70,7 +77,7 @@ export default function TwoPointSearchScreen(): JSX.Element {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert("Lỗi", "Cần quyền truy cập vị trí.");
-        setLoading(false);
+        setLoadings(false);
         return;
       }
 
@@ -88,15 +95,16 @@ export default function TwoPointSearchScreen(): JSX.Element {
         },
       });
 
-      const address = res.data?.results?.[0]?.formatted_address || "Vị trí hiện tại";
+      const address =
+        res.data?.results?.[0]?.formatted_address || "Vị trí hiện tại";
       setCurrentAddress(address);
 
       await fetchRoute(coords, destinationCoords);
-      setLoading(false);
+      setLoadings(false);
     })();
   }, []);
 
-  if (loading || !currentCoords) {
+  if (loadings || !currentCoords) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" color="#005cb8" />
@@ -104,6 +112,37 @@ export default function TwoPointSearchScreen(): JSX.Element {
       </View>
     );
   }
+
+  const handleSearch = async () => {
+    if (currentCoords && destinationCoords) {
+      const requestPayload: FindNearestWaypointsRequest = {
+        currentLocation: {
+          latitude: currentCoords.latitude,
+          longitude: currentCoords.longitude,
+        },
+        dropOffLocation: {
+          latitude: destinationCoords.latitude,
+          longitude: destinationCoords.longitude,
+        },
+        maxDistance: Number(maxDistance) * 1000,
+      };
+
+      try {
+        await dispatch(findNearest(requestPayload)).unwrap();
+        router.push({
+          pathname: "/(search)/result",
+          params: {
+            fromLocation: currentAddress,
+            toLocation: description as string,
+          },
+        });
+      } catch (error) {
+        Alert.alert("Lỗi", String(error));
+      }
+    } else {
+      Alert.alert("Thiếu thông tin", "Vui lòng chờ tải xong dữ liệu.");
+    }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -168,17 +207,7 @@ export default function TwoPointSearchScreen(): JSX.Element {
         </View>
 
         <TouchableOpacity
-          onPress={() => {
-            if (currentCoords && destinationCoords) {
-              console.log("====== Tìm kiếm nhà xe ======");
-              console.log("Vị trí hiện tại:", currentCoords);
-              console.log("Điểm đến:", destinationCoords);
-              console.log("Khoảng cách tối đa:", maxDistance, "km");
-              Alert.alert("Tìm kiếm đã được gửi!", "Xem kết quả trong console.");
-            } else {
-              Alert.alert("Thiếu thông tin", "Vui lòng chờ tải xong dữ liệu.");
-            }
-          }}
+          onPress={handleSearch}
           style={{
             backgroundColor: "#FF712C",
             padding: 14,
@@ -187,7 +216,13 @@ export default function TwoPointSearchScreen(): JSX.Element {
             marginBottom: 12,
           }}
         >
-          <Text style={{ color: "white", fontWeight: "bold" }}>Tìm chuyến xe</Text>
+          {loading ? (
+            <ActivityIndicator className="text-xl text-white" />
+          ) : (
+            <Text style={{ color: "white", fontWeight: "bold" }}>
+              Tìm chuyến xe
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -201,9 +236,17 @@ export default function TwoPointSearchScreen(): JSX.Element {
         }}
       >
         <Marker coordinate={currentCoords} title="Vị trí hiện tại" />
-        <Marker coordinate={destinationCoords} title="Điểm đến" pinColor="orange" />
+        <Marker
+          coordinate={destinationCoords}
+          title="Điểm đến"
+          pinColor="orange"
+        />
         {routeCoords.length > 0 && (
-          <Polyline coordinates={routeCoords} strokeColor="#1e88e5" strokeWidth={5} />
+          <Polyline
+            coordinates={routeCoords}
+            strokeColor="#1e88e5"
+            strokeWidth={5}
+          />
         )}
       </MapView>
     </View>

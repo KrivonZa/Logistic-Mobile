@@ -17,6 +17,7 @@ const MAPPING = {
   'person.fill': "person",
   'shippingbox.fill': 'inventory',
   'truck.box.fill': 'local-shipping',
+  'receipt.fill': 'receipt',
 } as Partial<
   Record<
     import('expo-symbols').SymbolViewProps['name'],

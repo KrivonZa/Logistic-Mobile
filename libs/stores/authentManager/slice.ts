@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { login } from "./thunk";
+import { login, register } from "./thunk";
 
 type stateType = {
   loading: boolean;
@@ -22,6 +22,15 @@ export const manageAuthenSlice = createSlice({
         state.loading = false;
       })
       .addCase(login.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(register.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(register.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(register.rejected, (state) => {
         state.loading = false;
       });
   },

@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useNavigation, router } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAuth } from "@/libs/context/AuthContext";
 
 interface Item {
   id: string;
@@ -74,6 +75,8 @@ export default function CheckoutScreen() {
   const navigation = useNavigation<Navigation>();
   const params = useLocalSearchParams<Params>();
   const { item_id, selected_company } = params;
+  const { companyID, companyName } = useAuth();
+  console.log(companyID, companyName);
 
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [selectedCompanyInfo, setSelectedCompanyInfo] =

@@ -104,12 +104,6 @@ export default function YourLocation() {
           >
             <Ionicons name="locate" size={26} color="#005cb8" />
           </TouchableOpacity>
-          {/* <TouchableOpacity
-            onPress={() => router.push("/(maps)")}
-            className="bg-white p-2 rounded-full shadow items-center"
-          >
-            <Ionicons name="expand" size={26} color="#005cb8" />
-          </TouchableOpacity> */}
         </View>
         <View className="absolute -bottom-3 right-2">
           <Image

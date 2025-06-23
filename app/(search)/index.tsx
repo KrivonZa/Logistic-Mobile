@@ -15,6 +15,14 @@ import { useRouter } from "expo-router";
 import axios from "axios";
 import debounce from "lodash/debounce";
 
+type RecentSearch = {
+  description: string;
+  location: {
+    lat: number;
+    lng: number;
+  };
+};
+
 export default function SearchScreen(): JSX.Element {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -23,7 +31,7 @@ export default function SearchScreen(): JSX.Element {
     null
   );
   const [hasSelectedSuggestion, setHasSelectedSuggestion] = useState(false);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
@@ -44,12 +52,17 @@ export default function SearchScreen(): JSX.Element {
     }
   };
 
-  const updateRecentSearches = async (newSearch: string) => {
+  const updateRecentSearches = async (newSearch: RecentSearch) => {
     try {
       const existing = await AsyncStorage.getItem("recent_searches");
-      let updated: string[] = existing ? JSON.parse(existing) : [];
-      updated = [newSearch, ...updated.filter((item) => item !== newSearch)];
+      let updated: RecentSearch[] = existing ? JSON.parse(existing) : [];
+
+      updated = [
+        newSearch,
+        ...updated.filter((item) => item.description !== newSearch.description),
+      ];
       if (updated.length > 5) updated = updated.slice(0, 5);
+
       await AsyncStorage.setItem("recent_searches", JSON.stringify(updated));
       setRecentSearches(updated);
     } catch (error) {
@@ -88,7 +101,7 @@ export default function SearchScreen(): JSX.Element {
     }
   }, [searchTerm]);
 
-  const handleSearch = (): void => {
+  const handleSearch = async (): Promise<void> => {
     if (searchTerm.trim() === "") {
       Alert.alert("Lỗi", "Vui lòng nhập địa điểm bạn muốn tìm.");
       return;
@@ -97,38 +110,43 @@ export default function SearchScreen(): JSX.Element {
     const selected =
       selectedSuggestion ||
       suggestions.find((s) => s.description === searchTerm);
+
     if (!selected || !selected.place_id) {
       Alert.alert("Lỗi", "Vui lòng chọn địa điểm hợp lệ từ gợi ý.");
       return;
     }
 
-    axios
-      .get("https://rsapi.goong.io/Place/Detail", {
+    try {
+      const res = await axios.get("https://rsapi.goong.io/Place/Detail", {
         params: {
           place_id: selected.place_id,
           api_key: process.env.EXPO_PUBLIC_GOONG_MAPS_API_KEY,
         },
-      })
-      .then((res) => {
-        const loc = res.data.result.geometry.location;
-        updateRecentSearches(selected.description);
-        setSelectedSuggestion(null); // reset lại sau khi search xong
-
-        router.push({
-          pathname: "/(search)/two-point",
-          params: {
-            lat: loc.lat.toString(),
-            lng: loc.lng.toString(),
-            description: selected.description,
-          },
-        });
-      })
-      .catch(() => {
-        Alert.alert("Lỗi", "Không thể lấy tọa độ vị trí.");
       });
 
-    Keyboard.dismiss();
-    setSuggestions([]);
+      const loc = res.data.result.geometry.location;
+
+      await updateRecentSearches({
+        description: selected.description,
+        location: loc,
+      });
+
+      setSelectedSuggestion(null);
+      setSearchTerm("");
+      setSuggestions([]);
+      Keyboard.dismiss();
+
+      router.push({
+        pathname: "/(search)/two-point",
+        params: {
+          lat: loc.lat.toString(),
+          lng: loc.lng.toString(),
+          description: selected.description,
+        },
+      });
+    } catch {
+      Alert.alert("Lỗi", "Không thể lấy tọa độ vị trí.");
+    }
   };
 
   return (
@@ -242,13 +260,19 @@ export default function SearchScreen(): JSX.Element {
             <TouchableOpacity
               key={idx}
               className="flex-row items-center p-4 bg-white rounded-lg mb-3 shadow-sm border border-gray-100"
-              // onPress={() => {
-              //   setSearchTerm(item);
-              //   setHasSelectedSuggestion(true);
-              //   inputRef.current?.focus();
-              // }}
               onPress={() => {
-                Alert.alert("Thông báo", "Chức năng đang phát triển");
+                setSearchTerm(item.description);
+                setSelectedSuggestion(null);
+                setHasSelectedSuggestion(true);
+                Keyboard.dismiss();
+                router.push({
+                  pathname: "/(search)/two-point",
+                  params: {
+                    lat: item.location.lat.toString(),
+                    lng: item.location.lng.toString(),
+                    description: item.description,
+                  },
+                });
               }}
             >
               <MaterialIcons
@@ -258,7 +282,9 @@ export default function SearchScreen(): JSX.Element {
                 className="mr-3"
               />
               <View className="flex-1">
-                <Text className="text-label text-base font-medium">{item}</Text>
+                <Text className="text-label text-base font-medium">
+                  {item.description}
+                </Text>
               </View>
               <MaterialIcons
                 name="arrow-forward-ios"

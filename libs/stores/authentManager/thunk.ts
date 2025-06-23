@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { manageAuthen } from "@/libs/services/manageAuthen";
-import { Login } from "@/libs/types/account";
+import { Login, Register } from "@/libs/types/account";
 import * as SecureStore from "expo-secure-store";
 import { parseJwt } from "@/libs/utils/auth";
 
@@ -18,7 +18,6 @@ export const login = createAsyncThunk(
       }
 
       const accountID = parseJwt(token);
-      console.log(token);
       await SecureStore.setItemAsync("authToken", token);
       await SecureStore.setItemAsync("role", role);
       await SecureStore.setItemAsync("accountID", accountID.sub);
@@ -26,6 +25,18 @@ export const login = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue("Email hoặc mật khẩu không đúng.");
+    }
+  }
+);
+
+export const register = createAsyncThunk(
+  "auth/register",
+  async (req: Register, { rejectWithValue }) => {
+    try {
+      const response = await manageAuthen.register(req);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue("Đăng ký không thành công.");
     }
   }
 );

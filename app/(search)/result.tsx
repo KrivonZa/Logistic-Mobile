@@ -1,79 +1,55 @@
 import React from "react";
 import {
-  Text,
   View,
+  Text,
   FlatList,
   TouchableOpacity,
   StatusBar,
-  Dimensions,
   Image,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-
-interface BusTrip {
-  id: string;
-  operator: string;
-  logo: string;
-  departureTime: string;
-  arrivalTime: string;
-  price: number;
-  availableSeats: number;
-}
-
-const { width } = Dimensions.get("window");
+import { useRoute } from "@/libs/hooks/useRoute";
+import type { RouteWithWaypoints } from "@/libs/types/route";
 
 export default function ResultScreen() {
   const { fromLocation, toLocation } = useLocalSearchParams();
   const router = useRouter();
+  const { routes } = useRoute();
 
-  const dummyBusTrips: BusTrip[] = [
-    {
-      id: "1",
-      operator: "Phương Trang",
-      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsM9tWv0skH1wZ9S6ZcI4lPRAF1I-N2E5bRA&s",
-      departureTime: "09:30 AM",
-      arrivalTime: "02:30 PM",
-      price: 265000,
-      availableSeats: 25,
-    },
-    {
-      id: "2",
-      operator: "Thành Bưởi",
-      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHf8-VhJeSV2SdtLEsmNLxNv3xBjLWkpK_bg&s",
-      departureTime: "10:00 AM",
-      arrivalTime: "03:00 PM",
-      price: 280000,
-      availableSeats: 20,
-    },
-  ];
-
-  const renderBusTripItem = ({ item }: { item: BusTrip }) => (
+  const renderBusRouteItem = ({ item }: { item: RouteWithWaypoints }) => (
     <TouchableOpacity
       className="bg-white rounded-xl p-4 mb-4 shadow-sm border border-gray-200 flex-row items-center"
       onPress={() =>
         router.push({
-          pathname: `/(company)/${item.id}`,
-          params: { title: item.operator },
+          pathname: `/(company)`,
+          params: {
+            title: item.Company.Account.fullName ?? "Không tên",
+            routeID: item.routeID,
+          },
         })
       }
     >
       <Image
-        source={{ uri: item.logo }}
+        source={{
+          uri:
+            item.Company.Account.avatar ||
+            "https://via.placeholder.com/50x50.png?text=No+Avatar",
+        }}
         style={{
           width: 50,
           height: 50,
           borderRadius: 8,
-          resizeMode: "contain",
+          resizeMode: "cover",
           marginRight: 12,
         }}
       />
       <View className="flex-1">
         <Text className="text-lg font-bold text-primary mb-1">
-          {item.operator}
+          {item.Company.Account.fullName || "Không rõ tài xế"}
         </Text>
-        <Text className="text-sm font-semibold text-accent">
-          Giá vé từ: {item.price.toLocaleString("vi-VN")} VNĐ
+        <Text className="text-sm text-accent">
+          {item.Company.address || "Chưa có địa chỉ"}
         </Text>
       </View>
     </TouchableOpacity>
@@ -83,6 +59,7 @@ export default function ResultScreen() {
     <View className="flex-1 bg-gray-100">
       <StatusBar barStyle="dark-content" backgroundColor="#F9FAFB" />
 
+      {/* Header */}
       <View className="p-4 bg-primary border-b border-gray-200 shadow-sm">
         <Text className="text-xl font-bold text-white mb-4">
           Kết quả tìm kiếm
@@ -103,10 +80,11 @@ export default function ResultScreen() {
         </View>
       </View>
 
+      {/* Danh sách chuyến */}
       <FlatList
-        data={dummyBusTrips}
-        renderItem={renderBusTripItem}
-        keyExtractor={(item) => item.id}
+        data={routes}
+        renderItem={renderBusRouteItem}
+        keyExtractor={(item) => item.routeID}
         contentContainerStyle={{ padding: 16 }}
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center p-4">

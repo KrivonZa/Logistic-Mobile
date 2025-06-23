@@ -45,7 +45,6 @@ export default function RootLayout() {
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
               <Stack.Screen name="(chat)" options={{ headerShown: false }} />
-              <Stack.Screen name="(maps)" options={{ headerShown: false }} />
               <Stack.Screen name="(search)" options={{ headerShown: false }} />
               <Stack.Screen name="(company)" options={{ headerShown: false }} />
               <Stack.Screen name="(package)" options={{ headerShown: false }} />
