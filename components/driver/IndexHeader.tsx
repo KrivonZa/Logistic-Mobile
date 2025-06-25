@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
+import { useAuth } from "@/libs/context/AuthContext";
 
 type Props = {
   scrollY: Animated.Value;
@@ -19,13 +20,14 @@ type Props = {
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const HEADER_MAX_HEIGHT = SCREEN_HEIGHT / 3.5;
-const HEADER_MIN_HEIGHT = 70;
+const HEADER_MIN_HEIGHT = 80;
 
 const AnimatedImageBackground =
   Animated.createAnimatedComponent(ImageBackground);
 
 const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
   const router = useRouter();
+  const { user } = useAuth();
 
   const headerHeight = scrollY.interpolate({
     inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
@@ -104,12 +106,22 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
             }}
           >
             <Animated.Image
-              source={{ uri: "https://i.pravatar.cc/40" }}
+              source={{
+                uri: user?.account.avatar,
+              }}
               className="w-10 h-10 rounded-full mr-2"
             />
-            <Animated.Text className="text-white text-lg font-semibold">
-              Tài xế Long
-            </Animated.Text>
+            <View>
+              <Animated.Text className="text-white text-lg font-semibold">
+                {user?.account.fullName}
+              </Animated.Text>
+
+              {user?.account.detail && "companyName" in user.account.detail && (
+                <Animated.Text className="text-white text-sm font-light">
+                  {user.account.detail.companyName}
+                </Animated.Text>
+              )}
+            </View>
           </Animated.View>
 
           <View className="flex-row gap-4">
@@ -137,7 +149,11 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
                     transform: [{ translateY: avatarTranslateY }],
                   }}
                 >
-                  <Ionicons name="chatbubble-ellipses" size={24} color="white" />
+                  <Ionicons
+                    name="chatbubble-ellipses"
+                    size={24}
+                    color="white"
+                  />
                 </Animated.View>
               </TouchableOpacity>
             </Link>
@@ -155,7 +171,12 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
         >
           <Link href="/(search)">
             <View className="flex-row items-center bg-white/90 rounded-full p-2">
-              <Ionicons name="search" size={24} color="#007bff" className="px-2" />
+              <Ionicons
+                name="search"
+                size={24}
+                color="#007bff"
+                className="px-2"
+              />
               <TextInput
                 numberOfLines={1}
                 className="flex-1 mx-2 pr-2 border-r-2 border-blue-500/80"
@@ -163,7 +184,12 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
                 editable={false}
               />
               <TouchableOpacity onPress={() => console.log("Quét mã đơn hàng")}>
-                <Ionicons name="scan" size={24} color="#007bff" className="px-2" />
+                <Ionicons
+                  name="scan"
+                  size={24}
+                  color="#007bff"
+                  className="px-2"
+                />
               </TouchableOpacity>
             </View>
           </Link>

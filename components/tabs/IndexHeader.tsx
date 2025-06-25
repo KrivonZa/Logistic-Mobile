@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
+import { useAuth } from "@/libs/context/AuthContext";
 
 type Props = {
   scrollY: Animated.Value;
@@ -27,6 +28,7 @@ const AnimatedImageBackground =
 
 const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
   const router = useRouter();
+  const { user } = useAuth();
 
   const headerHeight = scrollY.interpolate({
     inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
@@ -98,9 +100,7 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
       }}
     >
       <AnimatedImageBackground
-        source={
-          require("@/assets/images/header-image.png")
-        }
+        source={require("@/assets/images/header-image.png")}
         resizeMode="cover"
         className="px-4 pb-4 justify-around flex-1"
         style={{ flex: 1 }}
@@ -120,11 +120,13 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
             }}
           >
             <Animated.Image
-              source={{ uri: "https://i.pravatar.cc/40" }}
+              source={{
+                uri: user?.account.avatar,
+              }}
               className="w-10 h-10 rounded-full mr-2"
             />
             <Animated.Text className="text-white text-lg font-semibold">
-              Đặng Văn Lâm
+              {user?.account.fullName}
             </Animated.Text>
           </Animated.View>
 

@@ -1,24 +1,26 @@
 import { Text, View, ScrollView, Image, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useUser } from "@/libs/context/AuthContext";
+import { DriverDetail, CustomerDetail } from "@/libs/types/account";
+import dayjs from "dayjs";
 
 export default function ProfileScreen() {
-  const user = {
-    fullName: "Đặng Văn Lâm",
-    email: "lam@example.com",
-    phone: "0987654321",
-    gender: "Nam",
-    birthday: "1995-03-15",
-    address:
-      "123 Nguyễn Văn Cừ, Phường 5, Quận 5, Thành phố Hồ Chí Minh, Việt Nam, Chung cư ABC, Tầng 10, Căn hộ 101.",
-    avatarUrl: "https://i.pravatar.cc/150",
-  };
+  const user = useUser();
+  if (!user) return null;
+
+  const { account } = user;
+  const detail = account.detail;
+
+  const isDriver = account.role === "Driver";
+  const avatarUrl = account.avatar || "https://i.pravatar.cc/150";
 
   return (
     <ScrollView className="flex-1 bg-white pt-8">
+      {/* Avatar & header */}
       <View className="px-5 pb-6 items-center border-b border-gray-100 bg-white">
         <View className="relative mb-4">
           <Image
-            source={{ uri: user.avatarUrl }}
+            source={{ uri: avatarUrl }}
             className="w-32 h-32 rounded-full border-4 border-primary"
           />
           <TouchableOpacity
@@ -29,11 +31,12 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
         <Text className="text-2xl font-bold text-label mb-1">
-          {user.fullName}
+          {account.fullName}
         </Text>
         <Text className="text-base text-gray-500">Thông tin cá nhân</Text>
       </View>
 
+      {/* Details */}
       <View className="px-5 py-6">
         <TouchableOpacity
           className="absolute top-4 right-4 bg-gray-100 p-2 rounded-full shadow-sm"
@@ -46,57 +49,61 @@ export default function ProfileScreen() {
           Chi tiết tài khoản
         </Text>
 
-        <View className="flex-row items-center mb-4 p-4 bg-gray-100 rounded-lg shadow-xs">
-          <MaterialIcons name="email" size={24} color={"#005cb8"} />
-          <View className="ml-4 flex-1">
-            <Text className="text-sm font-semibold text-gray-700">Email</Text>
-            <Text className="text-base text-label">{user.email}</Text>
-          </View>
-        </View>
+        {/* Email */}
+        <InfoRow icon="email" label="Email" value={account.email} />
+        {/* Phone */}
+        <InfoRow
+          icon="phone"
+          label="Số điện thoại"
+          value={detail.phoneNumber}
+        />
 
-        <View className="flex-row items-center mb-4 p-4 bg-gray-100 rounded-lg shadow-xs">
-          <MaterialIcons name="phone" size={24} color={"#005cb8"} />
-          <View className="ml-4 flex-1">
-            <Text className="text-sm font-semibold text-gray-700">
-              Số điện thoại
-            </Text>
-            <Text className="text-base text-label">{user.phone}</Text>
-          </View>
-        </View>
+        {/* Customer fields */}
+        {!isDriver && (
+          <>
+            <InfoRow
+              icon="location-on"
+              label="Địa chỉ"
+              value={(detail as CustomerDetail).address}
+              multiline
+            />
+          </>
+        )}
 
-        <View className="flex-row items-center mb-4 p-4 bg-gray-100 rounded-lg shadow-xs">
-          <MaterialIcons name="person" size={24} color={"#005cb8"} />
-          <View className="ml-4 flex-1">
-            <Text className="text-sm font-semibold text-gray-700">
-              Giới tính
-            </Text>
-            <Text className="text-base text-label">{user.gender}</Text>
-          </View>
-        </View>
+        {/* Driver fields */}
+        {isDriver && (
+          <>
+            <InfoRow
+              icon="badge"
+              label="Số CMND/CCCD"
+              value={(detail as DriverDetail).identityNumber}
+            />
+            <InfoRow
+              icon="credit-card"
+              label="Bằng lái"
+              value={(detail as DriverDetail).licenseNumber}
+            />
+            <InfoRow
+              icon="layers"
+              label="Hạng"
+              value={(detail as DriverDetail).licenseLevel}
+            />
+            <InfoRow
+              icon="event"
+              label="Ngày hết hạn"
+              value={dayjs((detail as DriverDetail).licenseExpiry).format(
+                "DD/MM/YYYY"
+              )}
+            />
+            <InfoRow
+              icon="business"
+              label="Công ty"
+              value={(detail as DriverDetail).companyName}
+            />
+          </>
+        )}
 
-        <View className="flex-row items-center mb-4 p-4 bg-gray-100 rounded-lg shadow-xs">
-          <MaterialIcons name="cake" size={24} color={"#005cb8"} />
-          <View className="ml-4 flex-1">
-            <Text className="text-sm font-semibold text-gray-700">
-              Ngày sinh
-            </Text>
-            <Text className="text-base text-label">{user.birthday}</Text>
-          </View>
-        </View>
-
-        <View className="flex-row items-start mb-4 p-4 bg-gray-100 rounded-lg shadow-xs">
-          <MaterialIcons
-            name="location-on"
-            size={24}
-            color={"#005cb8"}
-            className="mr-4"
-          />
-          <View className="flex-1">
-            <Text className="text-sm font-semibold text-gray-700">Địa chỉ</Text>
-            <Text className="text-base text-label">{user.address}</Text>
-          </View>
-        </View>
-
+        {/* Info Box */}
         <View className="my-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
           <Text className="text-base font-semibold text-blue-700 mb-2">
             Lưu ý quan trọng:
@@ -110,3 +117,28 @@ export default function ProfileScreen() {
     </ScrollView>
   );
 }
+
+// Component hàng thông tin
+const InfoRow = ({
+  icon,
+  label,
+  value,
+  multiline = false,
+}: {
+  icon: any;
+  label: string;
+  value: string;
+  multiline?: boolean;
+}) => {
+  return (
+    <View
+      className={`flex-row items-start mb-4 p-4 bg-gray-100 rounded-lg shadow-xs`}
+    >
+      <MaterialIcons name={icon} size={24} color={"#005cb8"} />
+      <View className="ml-4 flex-1">
+        <Text className="text-sm font-semibold text-gray-700">{label}</Text>
+        <Text className="text-base text-label">{value}</Text>
+      </View>
+    </View>
+  );
+};

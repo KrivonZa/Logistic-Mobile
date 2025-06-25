@@ -256,43 +256,58 @@ export default function SearchScreen(): JSX.Element {
           Tìm kiếm gần đây
         </Text>
         <View className="pb-6">
-          {recentSearches.map((item, idx) => (
-            <TouchableOpacity
-              key={idx}
-              className="flex-row items-center p-4 bg-white rounded-lg mb-3 shadow-sm border border-gray-100"
-              onPress={() => {
-                setSearchTerm(item.description);
-                setSelectedSuggestion(null);
-                setHasSelectedSuggestion(true);
-                Keyboard.dismiss();
-                router.push({
-                  pathname: "/(search)/two-point",
-                  params: {
-                    lat: item.location.lat.toString(),
-                    lng: item.location.lng.toString(),
-                    description: item.description,
-                  },
-                });
-              }}
-            >
-              <MaterialIcons
-                name="history"
-                size={24}
-                color="#6B7280"
-                className="mr-3"
-              />
-              <View className="flex-1">
-                <Text className="text-label text-base font-medium">
-                  {item.description}
-                </Text>
-              </View>
-              <MaterialIcons
-                name="arrow-forward-ios"
-                size={16}
-                color="#D1D5DB"
-              />
-            </TouchableOpacity>
-          ))}
+          {recentSearches.length === 0 ? (
+            <Text className="text-base text-gray-500 italic">
+              Chưa có lịch sử tìm kiếm.
+            </Text>
+          ) : (
+            recentSearches
+              .filter(
+                (item) =>
+                  item &&
+                  typeof item.description === "string" &&
+                  item.location &&
+                  typeof item.location.lat === "number" &&
+                  typeof item.location.lng === "number"
+              )
+              .map((item, idx) => (
+                <TouchableOpacity
+                  key={idx}
+                  className="flex-row items-center p-4 bg-white rounded-lg mb-3 shadow-sm border border-gray-100"
+                  onPress={() => {
+                    setSearchTerm(item.description);
+                    setSelectedSuggestion(null);
+                    setHasSelectedSuggestion(true);
+                    Keyboard.dismiss();
+                    router.push({
+                      pathname: "/(search)/two-point",
+                      params: {
+                        lat: item.location.lat.toString(),
+                        lng: item.location.lng.toString(),
+                        description: item.description,
+                      },
+                    });
+                  }}
+                >
+                  <MaterialIcons
+                    name="history"
+                    size={24}
+                    color="#6B7280"
+                    style={{ marginRight: 12 }}
+                  />
+                  <View className="flex-1">
+                    <Text className="text-label text-base font-medium">
+                      {item.description}
+                    </Text>
+                  </View>
+                  <MaterialIcons
+                    name="arrow-forward-ios"
+                    size={16}
+                    color="#D1D5DB"
+                  />
+                </TouchableOpacity>
+              ))
+          )}
         </View>
       </ScrollView>
     </View>

@@ -8,7 +8,7 @@ import {
   FlatList,
   Image,
 } from "react-native";
-import AnimatedHeader from "@/components/tabs/IndexHeader";
+import AnimatedHeader from "@/components/driver/IndexHeader";
 import YourLocation from "@/components/tabs/YourLocation";
 import OrderNow from "@/components/tabs/OrderNow";
 

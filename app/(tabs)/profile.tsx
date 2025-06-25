@@ -11,19 +11,22 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useAuth } from "@/libs/context/AuthContext";
 
 export default function ProfileScreen() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   return (
     <ScrollView className="flex-1 bg-white pt-8 px-6">
-      <View className="flex-col items-center gap-y-5 mb-10">
+      <View className="flex-col items-center mb-10">
         <Image
           source={{
-            uri: "https://img.freepik.com/free-photo/close-up-upset-american-black-person_23-2148749582.jpg?semt=ais_hybrid&w=740",
+            uri: user?.account.avatar,
           }}
           style={{ width: 150, height: 150 }}
           className="border-2 border-primary rounded-full"
         />
-        <Text className="text-3xl font-bold text-label">Bob Smith</Text>
+        <Text className="text-3xl font-bold text-label mt-5">
+          {user?.account.fullName}
+        </Text>
+        <Text className="text-base text-label">{user?.account.email}</Text>
 
         {/* <TouchableOpacity className="bg-secondary px-12 py-4 rounded-full shadow-md">
           <Text className="text-white text-center font-bold text-xl">
@@ -37,7 +40,11 @@ export default function ProfileScreen() {
           <TouchableOpacity className="bg-gray-100 px-5 py-4 rounded-2xl shadow-sm">
             <View className="flex-row justify-between items-center">
               <View className="flex-row items-center gap-x-4">
-                <MaterialIcons name="person-outline" size={28} color="#2A2A2A" />
+                <MaterialIcons
+                  name="person-outline"
+                  size={28}
+                  color="#2A2A2A"
+                />
                 <Text className="text-xl font-medium text-label">
                   Thông tin cá nhân
                 </Text>
@@ -51,7 +58,11 @@ export default function ProfileScreen() {
           <TouchableOpacity className="bg-gray-100 px-5 py-4 rounded-2xl shadow-sm">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-x-4">
-                <MaterialIcons name="messenger-outline" size={28} color="#2A2A2A" />
+                <MaterialIcons
+                  name="messenger-outline"
+                  size={28}
+                  color="#2A2A2A"
+                />
                 <Text className="text-xl font-medium text-label">Tin nhắn</Text>
               </View>
               <MaterialIcons name="chevron-right" size={28} color="#9CA3AF" />
@@ -63,7 +74,11 @@ export default function ProfileScreen() {
           <TouchableOpacity className="bg-gray-100 px-5 py-4 rounded-2xl shadow-sm">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-x-4">
-                <MaterialIcons name="notifications-none" size={28} color="#2A2A2A" />
+                <MaterialIcons
+                  name="notifications-none"
+                  size={28}
+                  color="#2A2A2A"
+                />
                 <Text className="text-xl font-medium text-label">
                   Thông báo
                 </Text>

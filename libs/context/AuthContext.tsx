@@ -7,26 +7,30 @@ import {
 } from "react";
 import * as SecureStore from "expo-secure-store";
 import { parseJwt } from "@/libs/utils/auth";
-import { router } from "expo-router";
+import { router, usePathname } from "expo-router";
+import api from "@/libs/hooks/axiosInstance";
+import { User } from "@/libs/types/account";
 
-type AuthContextType = {
-  role: string | null;
+interface AuthContextType {
   token: string | null;
+  role: "Customer" | "Driver" | null;
   isLoading: boolean;
   logout: () => void;
   reloadAuth: () => Promise<void>;
+  user: User | null;
 
   companyID: string | null;
   companyName: string | null;
   setCompany: (id: string, name: string) => Promise<void>;
-};
+}
 
 const AuthContext = createContext<AuthContextType>({
-  role: null,
   token: null,
+  role: null,
   isLoading: true,
   logout: () => {},
   reloadAuth: async () => {},
+  user: null,
 
   companyID: null,
   companyName: null,
@@ -34,45 +38,44 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const useAuth = () => useContext(AuthContext);
+export const useUser = () => useContext(AuthContext).user;
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [role, setRole] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [role, setRole] = useState<"Customer" | "Driver" | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [companyID, setCompanyID] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const pathname = usePathname();
 
   const load = useCallback(async () => {
     setIsLoading(true);
 
     const storedToken = await SecureStore.getItemAsync("authToken");
     const storedRole = await SecureStore.getItemAsync("role");
-    const storedCompanyID = await SecureStore.getItemAsync("companyID");
-    const storedCompanyName = await SecureStore.getItemAsync("companyName");
 
     if (storedToken) {
       const payload = parseJwt(storedToken);
       const now = Math.floor(Date.now() / 1000);
+
       if (payload?.exp && payload.exp > now) {
         setToken(storedToken);
-        setRole(storedRole || null);
-        setCompanyID(storedCompanyID || null);
-        setCompanyName(storedCompanyName || null);
+        setRole(storedRole as "Customer" | "Driver");
+
+        try {
+          const res = await api.get<User>("/account");
+
+          setUser(res.data);
+        } catch (err) {
+          console.error("Failed to fetch user:", err);
+          await logout();
+        }
       } else {
-        await SecureStore.deleteItemAsync("authToken");
-        await SecureStore.deleteItemAsync("role");
-        await SecureStore.deleteItemAsync("companyID");
-        await SecureStore.deleteItemAsync("companyName");
-        setToken(null);
-        setRole(null);
-        setCompanyID(null);
-        setCompanyName(null);
+        await logout();
       }
     } else {
-      setToken(null);
-      setRole(null);
-      setCompanyID(null);
-      setCompanyName(null);
+      await logout();
     }
 
     setIsLoading(false);
@@ -80,23 +83,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, [pathname]);
 
   const logout = async () => {
     await SecureStore.deleteItemAsync("authToken");
     await SecureStore.deleteItemAsync("role");
-    await SecureStore.deleteItemAsync("companyID");
-    await SecureStore.deleteItemAsync("companyName");
+
     setToken(null);
     setRole(null);
+    setUser(null);
     setCompanyID(null);
     setCompanyName(null);
+
     router.replace("/(auth)/login");
   };
 
   const setCompany = async (id: string, name: string) => {
-    await SecureStore.setItemAsync("companyID", id);
-    await SecureStore.setItemAsync("companyName", name);
     setCompanyID(id);
     setCompanyName(name);
   };
@@ -104,11 +106,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AuthContext.Provider
       value={{
-        role,
         token,
+        role,
         isLoading,
         logout,
         reloadAuth: load,
+        user,
         companyID,
         companyName,
         setCompany,
