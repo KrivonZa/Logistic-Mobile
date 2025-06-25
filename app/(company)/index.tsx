@@ -220,7 +220,7 @@ export default function CompanyDetailWithSheet() {
       <TouchableOpacity
         onPress={() => {
           router.push("/(package)"),
-            setCompany(routeDetail?.companyID as string, title as string);
+            setCompany(routeDetail?.companyID as string, title as string, routeDetail?.routeID as string);
         }}
         className="mt-6 px-4 py-2 rounded-full border"
         style={{

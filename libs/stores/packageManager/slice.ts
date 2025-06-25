@@ -1,5 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getPackageByCustomer, getPackageByID } from "./thunk";
+import {
+  getPackageIdleByCustomer,
+  getPackageByID,
+  createPackage,
+} from "./thunk";
 import { Package } from "@/libs/types/package";
 
 type stateType = {
@@ -17,17 +21,26 @@ const initialState: stateType = {
 export const managePackageSlice = createSlice({
   name: "managePackage",
   initialState,
-  reducers: {},
+  reducers: {
+    resetPackages(state) {
+      state.packages = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(getPackageByCustomer.pending, (state) => {
+      .addCase(getPackageIdleByCustomer.pending, (state) => {
         state.loading = true;
       })
-      .addCase(getPackageByCustomer.fulfilled, (state, action) => {
+      .addCase(getPackageIdleByCustomer.fulfilled, (state, action) => {
         state.loading = false;
-        state.packages = action.payload.data.data;
+        const { page, data } = action.payload;
+        if (page === 1) {
+          state.packages = data.data;
+        } else {
+          state.packages = [...state.packages, ...data.data];
+        }
       })
-      .addCase(getPackageByCustomer.rejected, (state) => {
+      .addCase(getPackageIdleByCustomer.rejected, (state) => {
         state.loading = false;
       })
       .addCase(getPackageByID.pending, (state) => {
@@ -35,9 +48,18 @@ export const managePackageSlice = createSlice({
       })
       .addCase(getPackageByID.fulfilled, (state, action) => {
         state.loading = false;
-        state.packages = action.payload.data;
+        state.packageDetail = action.payload.data;
       })
       .addCase(getPackageByID.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(createPackage.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(createPackage.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(createPackage.rejected, (state) => {
         state.loading = false;
       });
   },

@@ -16,9 +16,6 @@ export const setAuthContext = (context: AuthContext) => {
 
 const api: AxiosInstance = axios.create({
   baseURL: `${process.env.EXPO_PUBLIC_BASE_URL}`,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 // ✅ Gắn token vào request nếu có
