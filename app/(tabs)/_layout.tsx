@@ -1,6 +1,7 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Platform } from "react-native";
+import { Platform, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
 
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -8,6 +9,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 
 export default function TabLayout() {
+  const router = useRouter();
   return (
     <Tabs
       screenOptions={{
@@ -54,6 +56,32 @@ export default function TabLayout() {
           title: "Tất cả đơn",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="receipt.fill" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="package"
+        options={{
+          title: "Tất cả kiện hàng",
+          headerStyle: {
+            backgroundColor: "#005cb8",
+          },
+          headerShown: true,
+          headerTitle: "Tất cả kiện hàng",
+          headerTintColor: "#fff",
+          headerTitleAlign: "center",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="shippingbox.fill" color={color} />
+          ),
+          headerRight: () => (
+            <TouchableOpacity
+              onPressIn={() => {
+                router.push("/(package)/create");
+              }}
+              style={{ marginRight: 12 }}
+            >
+              <MaterialIcons name="add" size={24} color="#fff" />
+            </TouchableOpacity>
           ),
         }}
       />

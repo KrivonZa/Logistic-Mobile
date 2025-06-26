@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
+import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
@@ -104,14 +105,14 @@ const OrderCard: React.FC<OrderCardProps> = ({ item }) => {
               {item.from}
             </Text>
             <Text className="text-xs text-gray-500 mt-2">Đến</Text>
-            <Text className="text-sm font-medium text-gray-700">
-              {item.to}
-            </Text>
+            <Text className="text-sm font-medium text-gray-700">{item.to}</Text>
           </View>
 
           <View className="items-end">
             <Text className="text-xs text-gray-500">Trạng thái</Text>
-            <Text className={`text-sm font-semibold ${getStatusColor(item.status)}`}>
+            <Text
+              className={`text-sm font-semibold ${getStatusColor(item.status)}`}
+            >
               {item.status}
             </Text>
 
@@ -130,6 +131,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ item }) => {
 };
 
 const OrderNow: React.FC = () => {
+  const router = useRouter();
   return (
     <View className="flex-1 p-4 pb-24 bg-gray-50">
       <Text className="text-lg font-bold text-gray-800 mb-4">
@@ -145,6 +147,7 @@ const OrderNow: React.FC = () => {
       />
 
       <TouchableOpacity
+        onPress={() => router.push("/(tabs)/order")}
         className="bg-primary mx-auto py-4 items-center rounded-full shadow-lg mt-6"
         style={{ width: width * 0.7 }}
       >

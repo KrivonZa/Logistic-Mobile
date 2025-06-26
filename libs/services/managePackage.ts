@@ -6,6 +6,11 @@ export const managePackage = {
     limit: number;
     routeID: string;
   }) => api.get(`/package-handler/idle`, { params }),
+  getAllPackageByCustomer: (params: {
+    page: number;
+    limit: number;
+    status?: string;
+  }) => api.get(`/package-handler`, { params }),
   getPackageByID: (req: string) => api.get(`/package-handler/${req}`),
   createPackage: (formData: FormData) =>
     api.post(`/package-handler`, formData, {

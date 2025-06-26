@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   getPackageIdleByCustomer,
+  getAllPackageByCustomer,
   getPackageByID,
   createPackage,
 } from "./thunk";
@@ -41,6 +42,21 @@ export const managePackageSlice = createSlice({
         }
       })
       .addCase(getPackageIdleByCustomer.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(getAllPackageByCustomer.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getAllPackageByCustomer.fulfilled, (state, action) => {
+        state.loading = false;
+        const { page, data } = action.payload;
+        if (page === 1) {
+          state.packages = data.data;
+        } else {
+          state.packages = [...state.packages, ...data.data];
+        }
+      })
+      .addCase(getAllPackageByCustomer.rejected, (state) => {
         state.loading = false;
       })
       .addCase(getPackageByID.pending, (state) => {

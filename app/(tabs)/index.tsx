@@ -11,31 +11,27 @@ import {
 import AnimatedHeader from "@/components/tabs/IndexHeader";
 import YourLocation from "@/components/tabs/YourLocation";
 import OrderNow from "@/components/tabs/OrderNow";
+import { useRouter } from "expo-router";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const HEADER_MAX_HEIGHT = SCREEN_HEIGHT / 3.5;
 
 const HomeScreen = () => {
   const scrollY = useRef(new Animated.Value(0)).current;
+  const router = useRouter();
 
   const quickActions = [
     {
       key: "book",
       label: "Đặt Chuyến",
       image: require("@/assets/images/icons/ticket.png"),
-      onPress: () => console.log("Navigate to Đặt Chuyến"),
+      onPress: () => router.push("/(search)"),
     },
     {
       key: "track",
       label: "Theo Dõi Đơn",
       image: require("@/assets/images/icons/tracking.png"),
       onPress: () => console.log("Navigate to Theo Dõi Đơn"),
-    },
-    {
-      key: "nearby",
-      label: "Chuyến Gần Đây",
-      image: require("@/assets/images/icons/nearby.png"),
-      onPress: () => console.log("Navigate to Chuyến Gần Đây"),
     },
     {
       key: "review",

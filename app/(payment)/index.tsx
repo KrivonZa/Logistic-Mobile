@@ -3,310 +3,459 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   TextInput,
-  Image,
+  TouchableOpacity,
   Alert,
-  Platform,
-  KeyboardAvoidingView,
+  Image,
+  Modal,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
-import { useLocalSearchParams, useNavigation, router } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useAuth } from "@/libs/context/AuthContext";
-
-interface Item {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  price: number;
-  weight: number;
-  dimensions: string;
-}
-
-interface Company {
-  name: string;
-  address?: string;
-  phone?: string;
-}
-
-interface Params {
-  item_id?: string;
-  selected_company?: string;
-}
-
-const allItems: Item[] = [
-  {
-    id: "SP001",
-    name: "Tủ lạnh Samsung Inverter",
-    description: "Tủ lạnh 2 cánh, dung tích 300L, tiết kiệm điện năng.",
-    image:
-      "https://cdn.nguyenkimmall.com/images/detailed/666/10046329-tu-lanh-samsung-inverter-380l-rt38k50822c-sv-2.jpg",
-    price: 12500000,
-    weight: 70,
-    dimensions: "60x65x170",
-  },
-  {
-    id: "SP002",
-    name: "Máy giặt Electrolux 9kg",
-    description: "Máy giặt lồng ngang, công nghệ UltraMix, giặt sạch hiệu quả.",
-    image:
-      "https://th.bing.com/th/id/R.3644ab582d4e8112fb23d0ebdd2d0e12?rik=3v14%2fsWDST4qVA&riu=http%3a%2f%2fdienlanhbavinh.com%2fwp-content%2fuploads%2f2018%2f12%2fIMG_20180526_2151221.jpg&ehk=1zvMH88OFvoTe%2boDRYGxGtqBXyBuDTlBWyZL2zAP2XE%3d&risl=&pid=ImgRaw&r=0",
-    price: 8900000,
-    weight: 65,
-    dimensions: "60x55x85",
-  },
-  {
-    id: "SP003",
-    name: "Laptop Dell XPS 15",
-    description: "Laptop cao cấp với màn hình 4K sắc nét, RAM 16GB, SSD 512GB.",
-    image:
-      "https://th.bing.com/th/id/OIP.hSos162cCyBM6uVNiOFmFQHaE8?rs=1&pid=ImgDetMain",
-    price: 35000000,
-    weight: 1.8,
-    dimensions: "35.7x23.5x1.8",
-  },
-];
-
-type Navigation = ReturnType<typeof useNavigation>;
+import { usePackage } from "@/libs/hooks/usePackage";
+import { useRoute } from "@/libs/hooks/useRoute";
+import { useOrder } from "@/libs/hooks/useOrder";
+import { MaterialIcons } from "@expo/vector-icons";
+import ImageModalViewer from "@/components/images/ImageZoomView";
+import { useAppDispatch } from "@/libs/stores";
+import { getPackageByID } from "@/libs/stores/packageManager/thunk";
+import { createOrderDelivery } from "@/libs/stores/orderManager/thunk";
+import priceTable from "@/price.json";
 
 export default function CheckoutScreen() {
-  const navigation = useNavigation<Navigation>();
-  const params = useLocalSearchParams<Params>();
-  const { item_id, selected_company } = params;
-  const { companyID, companyName } = useAuth();
-  console.log(companyID, companyName);
+  const dispatch = useAppDispatch();
+  const { packageID, companyName, companyID } = useAuth();
+  const router = useRouter();
 
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-  const [selectedCompanyInfo, setSelectedCompanyInfo] =
-    useState<Company | null>(null);
-  const [recipientName, setRecipientName] = useState<string>("");
-  const [recipientPhone, setRecipientPhone] = useState<string>("");
-  const [recipientAddress, setRecipientAddress] = useState<string>("");
-  const [deliveryDate] = useState<Date>(() => {
-    const now = new Date();
-    now.setHours(14, 30, 0, 0);
-    return now;
-  });
+  const { packageDetail } = usePackage();
+  const { routeDetail } = useRoute();
+  const { loading } = useOrder();
+
+  const [distanceText, setDistanceText] = useState("");
+  const [durationText, setDurationText] = useState("");
+  const [distanceValue, setDistanceValue] = useState(0);
+
+  const [pickUpPointID, setPickUpPointID] = useState("");
+  const [dropDownPointID, setDropDownPointID] = useState("");
+  const [isImageViewerVisible, setIsImageViewerVisible] = useState(false);
+  const [isLoadingDistance, setIsLoadingDistance] = useState(false);
+
+  const [payloadNote, setPayloadNote] = useState("");
+  const [recipientName, setRecipientName] = useState("");
+  const [recipientPhone, setRecipientPhone] = useState("");
 
   useEffect(() => {
-    if (item_id) {
-      const foundItem = allItems.find((item) => item.id === item_id);
-      setSelectedItem(foundItem || null);
-    }
-    if (selected_company) {
-      try {
-        setSelectedCompanyInfo(JSON.parse(selected_company) as Company);
-      } catch (e) {
-        console.error("Failed to parse selected_company:", e);
-      }
-    }
-  }, [item_id, selected_company]);
+    dispatch(getPackageByID(packageID as string));
+  }, []);
 
-  const handleProceedToPayment = () => {
-    if (
-      !selectedItem ||
-      !selectedCompanyInfo ||
-      !recipientName ||
-      !recipientPhone ||
-      !recipientAddress
-    ) {
-      Alert.alert(
-        "Thông báo",
-        "Vui lòng điền đầy đủ thông tin và chọn hàng/nhà xe."
-      );
-      return;
-    }
+  type DistanceKey = "d1" | "d3" | "d7";
+  type WeightKey =
+    | "w1"
+    | "w2"
+    | "w3"
+    | "w4"
+    | "w5"
+    | "w6"
+    | "w7"
+    | "w8"
+    | "w9"
+    | "w10";
 
-    const shippingFee = selectedItem.weight * 5000 + 20000;
-    const totalAmount = selectedItem.price + shippingFee;
+  const getPriceFromTable = (
+    weightStr: string,
+    distanceInKm: number
+  ): number => {
+    const weight = parseFloat(weightStr);
 
-    router.push({
-      pathname: "/(payment)",
-      params: {
-        item_id: selectedItem.id,
-        selected_company: JSON.stringify(selectedCompanyInfo),
-        recipientName,
-        recipientPhone,
-        recipientAddress,
-        deliveryDate: deliveryDate.toISOString(),
-        totalAmount: totalAmount.toString(),
-      },
-    });
+    let distanceKey: DistanceKey;
+    if (distanceInKm < 300000) distanceKey = "d1";
+    else if (distanceInKm < 700000) distanceKey = "d3";
+    else distanceKey = "d7";
+
+    // Convert weight
+    let weightKey: WeightKey;
+    if (weight < 10) weightKey = "w1";
+    else if (weight < 20) weightKey = "w2";
+    else if (weight < 30) weightKey = "w3";
+    else if (weight < 40) weightKey = "w4";
+    else if (weight < 50) weightKey = "w5";
+    else if (weight < 60) weightKey = "w6";
+    else if (weight < 70) weightKey = "w7";
+    else if (weight < 80) weightKey = "w8";
+    else if (weight < 90) weightKey = "w9";
+    else weightKey = "w10";
+
+    return priceTable[distanceKey][weightKey] ?? 0;
   };
 
-  if (!selectedItem) {
+  const [price, setPrice] = useState(0);
+
+  useEffect(() => {
+    if (packageDetail?.packageWeight && distanceValue > 0) {
+      const calculatedPrice = getPriceFromTable(
+        packageDetail.packageWeight,
+        distanceValue
+      );
+      setPrice(calculatedPrice);
+    }
+  }, [packageDetail?.packageWeight, distanceValue]);
+
+  //Tính tuyến đường
+  useEffect(() => {
+    const fetchDistance = async () => {
+      if (pickUpPointID && dropDownPointID) {
+        setIsLoadingDistance(true);
+
+        const pick = routeDetail?.Waypoint.find(
+          (wp) => wp.waypointID === pickUpPointID
+        );
+        const drop = routeDetail?.Waypoint.find(
+          (wp) => wp.waypointID === dropDownPointID
+        );
+
+        if (pick?.geoLocation && drop?.geoLocation) {
+          const pickLocation = JSON.parse(pick.geoLocation);
+          const dropLocation = JSON.parse(drop.geoLocation);
+
+          const [lng1, lat1] = pickLocation.coordinates;
+          const [lng2, lat2] = dropLocation.coordinates;
+
+          const origin = `${lat1},${lng1}`;
+          const destination = `${lat2},${lng2}`;
+
+          const result = await getDistanceBetweenPoints(origin, destination);
+
+          if (result) {
+            setDistanceText(result.distanceText);
+            setDurationText(result.durationText);
+            setDistanceValue(result.distanceValue);
+          }
+        }
+        setIsLoadingDistance(false);
+      }
+    };
+
+    fetchDistance();
+  }, [pickUpPointID, dropDownPointID]);
+
+  const getDistanceBetweenPoints = async (
+    origin: string,
+    destination: string
+  ): Promise<{
+    distanceText: string;
+    distanceValue: number;
+    durationText: string;
+  } | null> => {
+    const apiKey = process.env.EXPO_PUBLIC_GOONG_MAPS_API_KEY;
+    const url = `https://rsapi.goong.io/Direction?origin=${origin}&destination=${destination}&vehicle=car&api_key=${apiKey}`;
+
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (data?.routes?.[0]?.legs?.[0]) {
+        const leg = data.routes[0].legs[0];
+        return {
+          distanceText: leg.distance.text,
+          distanceValue: leg.distance.value,
+          durationText: leg.duration.text,
+        };
+      } else {
+        console.warn("Không lấy được dữ liệu khoảng cách");
+        return null;
+      }
+    } catch (error) {
+      console.error("Lỗi khi gọi Goong API:", error);
+      return null;
+    }
+  };
+
+  if (!packageDetail || !routeDetail) {
     return (
-      <View className="flex-1 justify-center items-center bg-gray-100">
-        <Text className="text-gray-600 text-lg">
-          Đang tải thông tin hàng hóa...
+      <View className="flex-1 items-center justify-center bg-gray-50">
+        <Text className="text-base text-red-600 text-center">
+          Không tìm thấy thông tin đơn hàng hoặc lộ trình.
         </Text>
       </View>
     );
   }
 
-  const shippingFee = selectedItem.weight * 5000 + 20000;
-  const formattedShippingFee = shippingFee.toLocaleString("vi-VN") + " VNĐ";
-  const formattedItemPrice =
-    selectedItem.price.toLocaleString("vi-VN") + " VNĐ";
-  const totalAmount = selectedItem.price + shippingFee;
+  const formattedPrice = price.toLocaleString("vi-VN") + " VNĐ";
+
+  const handleCancel = () => {
+    if (!pickUpPointID || !dropDownPointID) {
+      Alert.alert("Thiếu thông tin", "Vui lòng nhập đầy đủ thông tin.");
+      return;
+    }
+  };
+
+  const handleCheckout = async () => {
+    if (!pickUpPointID || !dropDownPointID) {
+      Alert.alert("Thiếu thông tin", "Vui lòng nhập đầy đủ thông tin.");
+      return;
+    }
+
+    const data = {
+      routeID: routeDetail.routeID,
+      companyID: companyID as string,
+      pickUpPointID,
+      dropDownPointID,
+      packageID: packageID as string,
+      price: price,
+      payloadNote,
+    };
+
+    await dispatch(createOrderDelivery(data));
+    Alert.alert(
+      "Tạo đơn thành công",
+      "Đơn sẽ được xét duyệt bởi doanh nghiệp trong vòng 24h tới",
+      [
+        {
+          text: "OK",
+          onPress: () => router.push("/(tabs)/order"),
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const images = packageDetail.packageImage
+    ? [{ url: packageDetail.packageImage }]
+    : [];
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
+      <ScrollView
+        className="flex-1 p-4"
+        contentContainerStyle={{ paddingBottom: 80 }}
       >
-        <ScrollView className="flex-1 p-4">
-          <View className="bg-white rounded-lg shadow-sm p-4 mb-4">
-            <Text className="text-xl font-bold text-gray-800 mb-3">
-              Chi tiết hàng hóa
-            </Text>
-            <View className="flex-row items-center mb-3">
+        {/* Chi tiết kiện hàng */}
+        <View className="bg-white rounded-xl p-5 mb-4 shadow-md">
+          <Text className="text-2xl text-center font-semibold text-secondary mb-3">
+            Chi tiết kiện hàng
+          </Text>
+
+          {packageDetail.packageImage ? (
+            <TouchableOpacity onPress={() => setIsImageViewerVisible(true)}>
               <Image
-                source={{ uri: selectedItem.image }}
-                className="w-20 h-20 rounded-md mr-4"
+                source={{ uri: packageDetail.packageImage }}
+                className="w-full h-40 rounded-lg mb-4 object-cover"
                 resizeMode="cover"
               />
-              <View className="flex-1">
-                <Text className="text-lg font-semibold text-label">
-                  {selectedItem.name}
-                </Text>
-                <Text className="text-sm text-gray-600">
-                  Mã: {selectedItem.id}
-                </Text>
-                <Text className="text-base font-bold text-blue-600 mt-1">
-                  {formattedItemPrice}
-                </Text>
-              </View>
-            </View>
-            <View className="border-t border-gray-200 pt-3">
-              <Text className="text-base text-gray-700">
-                Khối lượng: {selectedItem.weight} kg
-              </Text>
-              <Text className="text-base text-gray-700">
-                Kích Measure: {selectedItem.dimensions} cm
-              </Text>
-            </View>
-          </View>
-
-          <View className="bg-white rounded-lg shadow-sm p-4 mb-4">
-            <Text className="text-xl font-bold text-gray-800 mb-3">
-              Nhà xe vận chuyển
-            </Text>
-            {selectedCompanyInfo ? (
-              <View>
-                <Text className="text-lg font-semibold text-blue-700 mb-1">
-                  {selectedCompanyInfo.name}
-                </Text>
-                <Text className="text-base text-gray-600">
-                  Địa chỉ: {selectedCompanyInfo.address || "Đang cập nhật"}
-                </Text>
-                <Text className="text-base text-gray-600">
-                  Điện thoại: {selectedCompanyInfo.phone || "Đang cập nhật"}
-                </Text>
-              </View>
-            ) : (
-              <Text className="text-base text-red-500">
-                Chưa chọn nhà xe. Vui lòng quay lại chọn nhà xe.
-              </Text>
-            )}
-          </View>
-
-          <View className="bg-white rounded-lg shadow-sm p-4 mb-4">
-            <Text className="text-xl font-bold text-gray-800 mb-3">
-              Thông tin người nhận hàng
-            </Text>
-            <TextInput
-              className="border border-gray-300 rounded-md p-3 mb-3 text-base"
-              placeholder="Tên người nhận"
-              value={recipientName}
-              onChangeText={setRecipientName}
-            />
-            <TextInput
-              className="border border-gray-300 rounded-md p-3 mb-3 text-base"
-              placeholder="Số điện thoại người nhận"
-              keyboardType="phone-pad"
-              value={recipientPhone}
-              onChangeText={setRecipientPhone}
-            />
-            <TextInput
-              className="border border-gray-300 rounded-md p-3 text-base"
-              placeholder="Địa chỉ nhận hàng chi tiết"
-              multiline
-              numberOfLines={3}
-              value={recipientAddress}
-              onChangeText={setRecipientAddress}
-            />
-          </View>
-
-          <View className="bg-white rounded-lg shadow-sm p-4 mb-4">
-            <Text className="text-xl font-bold text-gray-800 mb-3">
-              Giờ nhận hàng mong muốn
-            </Text>
-            <View className="border border-gray-300 rounded-md p-3 flex-row items-center justify-between bg-gray-50">
-              <Text className="text-base text-gray-700 font-semibold">
-                {deliveryDate.toLocaleDateString("vi-VN", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                })}{" "}
-                - 14:30
-              </Text>
-              <MaterialCommunityIcons
-                name="clock-outline"
-                size={24}
-                color="#6b7280"
+            </TouchableOpacity>
+          ) : (
+            <View className="w-full h-40 rounded-lg mb-4 bg-gray-200 items-center justify-center">
+              <MaterialIcons
+                name="image-not-supported"
+                size={48}
+                color="gray"
               />
+              <Text className="text-gray-500 text-sm mt-2">
+                Không có hình ảnh
+              </Text>
             </View>
-          </View>
+          )}
 
-          <View className="bg-white rounded-lg shadow-sm p-4 mb-4">
-            <Text className="text-xl font-bold text-gray-800 mb-3">
-              Tổng kết đơn hàng
+          <View className="flex-row justify-between mb-2 pb-1 border-b border-gray-200">
+            <Text className="text-base text-gray-700">Tên kiện hàng:</Text>
+            <Text className="text-base text-gray-800 font-medium">
+              {packageDetail.packageName}
             </Text>
-            <View className="flex-row justify-between mb-2">
-              <Text className="text-base-unit text-gray-700">
-                Giá trị hàng hóa:
-              </Text>
-              <Text className="text-base-unit font-semibold text-gray-800">
-                {formattedItemPrice}
-              </Text>
-            </View>
-            <View className="flex-row justify-between mb-2">
-              <Text className="text-base-unit text-gray-700">
-                Phí vận chuyển (ước tính):
-              </Text>
-              <Text className="text-base-unit font-semibold text-gray-800">
-                {formattedShippingFee}
-              </Text>
-            </View>
-            <View className="border-t border-gray-200 mt-2 pt-2 flex-row justify-between">
-              <Text className="text-lg font-bold text-gray-900">
-                Tổng cộng:
-              </Text>
-              <Text className="text-lg font-bold text-blue-600">
-                {totalAmount.toLocaleString("vi-VN")} VNĐ
-              </Text>
-            </View>
           </View>
-
-          <TouchableOpacity
-            onPress={handleProceedToPayment}
-            className="bg-green-600 py-4 rounded-lg flex-row items-center justify-center mb-6"
-          >
-            <MaterialCommunityIcons
-              name="credit-card-outline"
-              size={24}
-              color="#fff"
-            />
-            <Text className="text-white text-xl font-bold ml-2">
-              Tiếp tục thanh toán
+          <View className="flex-row justify-between mb-2 pb-1 border-b border-gray-200">
+            <Text className="text-base text-gray-700">Khối lượng:</Text>
+            <Text className="text-base text-gray-800 font-medium">
+              {packageDetail.packageWeight} kg
             </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </View>
+          <View className="flex-row justify-between mb-2 pb-1 border-b border-gray-200">
+            <Text className="text-base text-gray-700">Ghi chú:</Text>
+            <Text className="text-base text-gray-800 font-medium">
+              {packageDetail.note || "Không có"}
+            </Text>
+          </View>
+          <View className="flex-row items-center mt-3 pt-3">
+            <MaterialIcons name="money" size={24} color="#4CAF50" />
+            <Text className="text-xl font-bold text-green-600 ml-1">
+              Giá vận chuyển:
+              {isLoadingDistance ? (
+                <Text className="text-base text-gray-400 italic">
+                  Đang tính...
+                </Text>
+              ) : (
+                <Text> {formattedPrice}</Text>
+              )}
+            </Text>
+          </View>
+        </View>
+
+        {/* Thông tin lộ trình */}
+        <View className="bg-white rounded-xl p-5 mb-4 shadow-md">
+          <Text className="text-2xl text-center font-semibold text-secondary mb-3">
+            Thông tin lộ trình
+          </Text>
+
+          <View className="flex-row justify-between mb-2 pb-1 border-b border-gray-200">
+            <Text className="text-base text-gray-700">Tên lộ trình:</Text>
+            <Text className="text-base text-gray-800 font-medium">
+              {routeDetail.routeName}
+            </Text>
+          </View>
+          <View className="flex-row justify-between mb-2 pb-1 border-b border-gray-200">
+            <Text className="text-base text-gray-700">Nhà xe:</Text>
+            <Text className="text-base text-gray-800 font-medium">
+              {companyName}
+            </Text>
+          </View>
+          {(isLoadingDistance || (distanceText && durationText)) && (
+            <View className="mt-2 mb-2 pt-2">
+              <View className="flex-row justify-between mb-1">
+                <Text className="text-base text-gray-700">Khoảng cách:</Text>
+                {isLoadingDistance ? (
+                  <Text className="text-base text-gray-400 italic">
+                    Đang tính...
+                  </Text>
+                ) : (
+                  <Text className="text-base text-gray-800 font-medium">
+                    {distanceText}
+                  </Text>
+                )}
+              </View>
+              <View className="flex-row justify-between">
+                <Text className="text-base text-gray-700">
+                  Thời gian ước tính:
+                </Text>
+                {isLoadingDistance ? (
+                  <Text className="text-base text-gray-400 italic">
+                    Đang tính...
+                  </Text>
+                ) : (
+                  <Text className="text-base text-gray-800 font-medium">
+                    {durationText}
+                  </Text>
+                )}
+              </View>
+            </View>
+          )}
+
+          <Text className="mt-4 mb-2 text-base font-semibold text-gray-800 flex-row items-center">
+            <MaterialIcons name="my-location" size={16} color="#333333" /> Chọn
+            điểm nhận hàng:
+          </Text>
+          {routeDetail.Waypoint.map((wp) => {
+            const isDisabled = dropDownPointID === wp.waypointID;
+            const isSelected = pickUpPointID === wp.waypointID;
+
+            return (
+              <TouchableOpacity
+                key={wp.waypointID}
+                onPress={() => !isDisabled && setPickUpPointID(wp.waypointID)}
+                className={`p-3 rounded-lg border mb-2 ${
+                  isSelected
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-gray-300 bg-gray-50"
+                } ${isDisabled ? "opacity-50" : ""}`}
+                disabled={isDisabled}
+              >
+                <Text
+                  className={`text-base ${
+                    isSelected ? "text-blue-700 font-bold" : "text-gray-800"
+                  }`}
+                >
+                  {wp.location}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+
+          <Text className="mt-4 mb-2 text-base font-semibold text-gray-800 flex-row items-center">
+            <MaterialIcons name="location-on" size={16} color="#333333" /> Chọn
+            điểm trả hàng:
+          </Text>
+          {routeDetail.Waypoint.map((wp) => {
+            const isDisabled = pickUpPointID === wp.waypointID;
+            const isSelected = dropDownPointID === wp.waypointID;
+
+            return (
+              <TouchableOpacity
+                key={wp.waypointID}
+                onPress={() => !isDisabled && setDropDownPointID(wp.waypointID)}
+                className={`p-3 rounded-lg border mb-2 ${
+                  isSelected
+                    ? "border-green-500 bg-green-50"
+                    : "border-gray-300 bg-gray-50"
+                } ${isDisabled ? "opacity-50" : ""}`}
+                disabled={isDisabled}
+              >
+                <Text
+                  className={`text-base ${
+                    isSelected ? "text-green-700 font-bold" : "text-gray-800"
+                  }`}
+                >
+                  {wp.location}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* Recipient Info */}
+        <View className="bg-white rounded-xl p-5 shadow-md">
+          <Text className="text-lg font-bold text-gray-800 mb-3">
+            Thông tin người nhận và ghi chú
+          </Text>
+          <TextInput
+            placeholder="Họ và tên người nhận"
+            value={recipientName}
+            onChangeText={setRecipientName}
+            className="mb-3 border border-gray-300 rounded-lg px-4 py-3 text-base text-gray-800 bg-white"
+          />
+          <TextInput
+            placeholder="Số điện thoại"
+            value={recipientPhone}
+            onChangeText={setRecipientPhone}
+            keyboardType="phone-pad"
+            className="mb-3 border border-gray-300 rounded-lg px-4 py-3 text-base text-gray-800 bg-white"
+          />
+          <TextInput
+            placeholder="Ghi chú (nếu có)"
+            value={payloadNote}
+            onChangeText={setPayloadNote}
+            multiline
+            className="border border-gray-300 rounded-lg px-4 py-3 text-base text-gray-800 bg-white h-24"
+          />
+        </View>
+      </ScrollView>
+
+      {/* Bottom buttons */}
+      <View className="absolute bottom-4 left-0 right-0 px-4">
+        <TouchableOpacity
+          onPress={handleCheckout}
+          disabled={!price}
+          className={` ${
+            price ? "bg-primary" : "bg-gray-400"
+          } flex-1 py-4 rounded-xl items-center justify-center shadow-lg`}
+        >
+          {loading ? (
+            <ActivityIndicator className="text-xl text-white" />
+          ) : (
+            <View className="flex-row">
+              <MaterialIcons name="check" size={24} color="#fff" />
+              <Text className="text-white text-lg font-bold ml-2">
+                Tạo đơn - {formattedPrice}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
+
+      {/* Image Viewer */}
+      <ImageModalViewer
+        visible={isImageViewerVisible}
+        images={images}
+        onClose={() => setIsImageViewerVisible(false)}
+      />
     </SafeAreaView>
   );
 }

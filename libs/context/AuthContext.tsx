@@ -22,6 +22,8 @@ interface AuthContextType {
   companyID: string | null;
   companyName: string | null;
   routeID: string | null;
+  packageID: string | null;
+  setPackageID: (id: string | null) => void;
   setCompany: (id: string, name: string, routeID: string) => Promise<void>;
 }
 
@@ -36,6 +38,8 @@ const AuthContext = createContext<AuthContextType>({
   companyID: null,
   companyName: null,
   routeID: null,
+  packageID: null,
+  setPackageID: async () => {},
   setCompany: async () => {},
 });
 
@@ -49,6 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [companyID, setCompanyID] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState<string | null>(null);
   const [routeID, setRouteID] = useState<string | null>(null);
+  const [packageID, setPackageID] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const pathname = usePathname();
 
@@ -57,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const storedToken = await SecureStore.getItemAsync("authToken");
     const storedRole = await SecureStore.getItemAsync("role");
-    // console.log(token)
+    // console.log(storedToken)
 
     if (storedToken) {
       const payload = parseJwt(storedToken);
@@ -121,6 +126,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         companyID,
         companyName,
         routeID,
+        packageID,
+        setPackageID,
         setCompany,
       }}
     >

@@ -1,7 +1,10 @@
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import React from "react";
+import { TouchableOpacity } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function StackLayout() {
+  const router = useRouter();
   return (
     <Stack
       screenOptions={{
@@ -13,12 +16,7 @@ export default function StackLayout() {
         },
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Xác nhận đơn hàng" }} />
-      <Stack.Screen
-        name="method"
-        options={{ title: "Phương thức thanh toán" }}
-      />
-      <Stack.Screen name="paid" options={{ title: "Thanh toán thành công" }} />
+      <Stack.Screen name="[id]" options={{ title: "Chi tiết đơn" }} />
     </Stack>
   );
 }

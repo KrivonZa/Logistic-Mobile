@@ -40,7 +40,7 @@ export default function CompanyDetailWithSheet() {
   const { routeDetail } = useRoute();
   const dispatch = useAppDispatch();
 
-  const { setCompany } = useAuth();
+  const { setCompany, packageID } = useAuth();
 
   const currentRoute = routeDetail as RouteWithWaypoints | undefined;
 
@@ -194,6 +194,21 @@ export default function CompanyDetailWithSheet() {
     setTripDirection((prev) => (prev === "go" ? "return" : "go"));
   };
 
+  const handleSelectRoute = () => {
+    // Gọi setCompany nếu có đủ dữ liệu
+    if (routeDetail?.companyID && title && routeDetail?.routeID) {
+      setCompany(routeDetail.companyID, title.toString(), routeDetail.routeID);
+    } else {
+      Alert.alert("Thiếu thông tin", "Không thể set công ty do thiếu dữ liệu.");
+      return;
+    }
+    if (packageID) {
+      router.push("/(payment)");
+    } else {
+      router.push("/(package)");
+    }
+  };
+
   const renderRoute = () => (
     <View className="px-6 pr-10 py-4">
       {tripPoints.map((point, index) => (
@@ -218,10 +233,7 @@ export default function CompanyDetailWithSheet() {
         </View>
       ))}
       <TouchableOpacity
-        onPress={() => {
-          router.push("/(package)"),
-            setCompany(routeDetail?.companyID as string, title as string, routeDetail?.routeID as string);
-        }}
+        onPress={handleSelectRoute}
         className="mt-6 px-4 py-2 rounded-full border"
         style={{
           backgroundColor: theme.color,
