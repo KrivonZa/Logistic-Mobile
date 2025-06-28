@@ -18,7 +18,7 @@ import { managePackageActions } from "@/libs/stores/packageManager/slice";
 import { useAuth } from "@/libs/context/AuthContext";
 
 export default function YourPackageScreen() {
-  const { routeID } = useAuth();
+  const { routeID, setPackageID } = useAuth();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { packages, loading } = usePackage();
@@ -75,12 +75,20 @@ export default function YourPackageScreen() {
 
   const handleLoadMore = () => {
     if (!loading && hasMore && !isFetchingMore && safePackages.length > 0) {
-      console.log("handleLoadMore triggered", { page, hasMore, isFetchingMore });
+      console.log("handleLoadMore triggered", {
+        page,
+        hasMore,
+        isFetchingMore,
+      });
       const nextPage = page + 1;
       setPage(nextPage);
       fetchPackages(nextPage);
     } else {
-      console.warn("handleLoadMore skipped", { loading, hasMore, isFetchingMore });
+      console.warn("handleLoadMore skipped", {
+        loading,
+        hasMore,
+        isFetchingMore,
+      });
     }
   };
 
@@ -89,6 +97,7 @@ export default function YourPackageScreen() {
   };
 
   const handleChooseItem = (item: any) => {
+    setPackageID(item.packageID);
     router.push({
       pathname: "/(payment)",
       params: {
