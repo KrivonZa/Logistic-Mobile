@@ -87,6 +87,10 @@ export default function YourPackageScreen() {
   };
 
   const handlePressDetail = (item: any) => {
+    router.push(`/(package)/${item.packageID}`);
+  };
+
+  const handleSendNow = (item: any) => {
     setPackageID(item.packageID);
     router.push(`/(search)`);
   };
@@ -97,11 +101,13 @@ export default function YourPackageScreen() {
       className="mb-4 bg-white rounded-lg shadow-md overflow-hidden border border-gray-200"
     >
       <View className="flex-row p-3 items-center">
-        <Image
-          source={{ uri: item.packageImage }}
-          className="w-24 h-24 rounded-md mr-4"
-          resizeMode="cover"
-        />
+        {item.packageImage ? (
+          <Image
+            source={{ uri: item.packageImage }}
+            className="w-24 h-24 rounded-md mr-4"
+            resizeMode="cover"
+          />
+        ) : null}
         <View className="flex-1">
           <View className="flex-row justify-between items-center mb-1">
             <Text className="text-sm font-semibold text-gray-500">
@@ -129,7 +135,7 @@ export default function YourPackageScreen() {
           <TouchableOpacity
             onPress={(event) => {
               event.stopPropagation();
-              handlePressDetail(item);
+              handleSendNow(item);
             }}
             className="mt-3 self-end bg-secondary px-4 py-2 rounded-lg flex-row items-center"
           >

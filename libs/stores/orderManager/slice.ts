@@ -1,15 +1,25 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createOrderDelivery, getCreatedOrderDelivery } from "./thunk";
-import { orderDelivery } from "@/libs/types/order";
+import {
+  createOrderDelivery,
+  getCreatedOrderDelivery,
+  detailOrderDelivery,
+} from "./thunk";
+import { OrderDelivery } from "@/libs/types/order";
 
 type stateType = {
   loading: boolean;
-  orderDeliveries: orderDelivery[] | [];
+  orderDeliveries: OrderDelivery[];
+  page: number;
+  total: number;
+  detailOrder: OrderDelivery | null;
 };
 
 const initialState: stateType = {
   loading: false,
   orderDeliveries: [],
+  page: 1,
+  total: 0,
+  detailOrder: null,
 };
 
 export const manageOrderDeliverySlice = createSlice({
@@ -32,9 +42,29 @@ export const manageOrderDeliverySlice = createSlice({
       })
       .addCase(getCreatedOrderDelivery.fulfilled, (state, action) => {
         state.loading = false;
-        state.orderDeliveries = action.payload.data;
+        const { data, page, total, isLoadMore } = action.payload;
+
+        if (isLoadMore) {
+          state.orderDeliveries = [...state.orderDeliveries, ...data];
+        } else {
+          state.orderDeliveries = data;
+        }
+
+        state.page = page;
+        state.total = total;
       })
       .addCase(getCreatedOrderDelivery.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(detailOrderDelivery.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(detailOrderDelivery.fulfilled, (state, action) => {
+        console.log(action.payload.data);
+        state.loading = false;
+        state.detailOrder = action.payload.data;
+      })
+      .addCase(detailOrderDelivery.rejected, (state) => {
         state.loading = false;
       });
   },

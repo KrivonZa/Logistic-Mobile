@@ -2,8 +2,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/libs/stores";
 
 export const useOrder = () => {
-  const { loading, orderDeliveries } = useSelector(
+  const { loading, orderDeliveries, page, total, detailOrder } = useSelector(
     (state: RootState) => state.manageOrderDelivery
   );
-  return { loading, orderDeliveries };
+  return { loading, orderDeliveries, page, total, detailOrder };
 };

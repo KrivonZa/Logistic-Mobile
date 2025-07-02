@@ -229,7 +229,7 @@ export default function LoginScreen() {
                 </TouchableOpacity>
               </Animated.View>
 
-              <Animated.View style={{ transform: [{ scale: buttonScale2 }] }}>
+              {/* <Animated.View style={{ transform: [{ scale: buttonScale2 }] }}>
                 <TouchableOpacity
                   className="bg-white mx-auto py-4 items-center rounded-full shadow-lg shadow-tertiary flex-row justify-center"
                   style={{ width: width * 0.7 }}
@@ -242,7 +242,7 @@ export default function LoginScreen() {
                     Đăng nhập bằng Google
                   </Text>
                 </TouchableOpacity>
-              </Animated.View>
+              </Animated.View> */}
 
               <View className="flex-row justify-center mt-2">
                 <Text className="text-gray-600 font-medium">

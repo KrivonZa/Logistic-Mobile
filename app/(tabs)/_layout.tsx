@@ -53,6 +53,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="order"
         options={{
+          headerStyle: {
+            backgroundColor: "#005cb8",
+          },
+          headerShown: true,
+          headerTitle: "Tất cả đơn",
+          headerTintColor: "#fff",
+          headerTitleAlign: "center",
           title: "Tất cả đơn",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="receipt.fill" color={color} />

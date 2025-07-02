@@ -1,5 +1,5 @@
 import { Text, View, ScrollView, Image, TouchableOpacity } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUser } from "@/libs/context/AuthContext";
 import { DriverDetail, CustomerDetail } from "@/libs/types/account";
 import dayjs from "dayjs";
@@ -36,6 +36,19 @@ export default function ProfileScreen() {
         <Text className="text-base text-gray-500">Thông tin cá nhân</Text>
       </View>
 
+      {/* Wallet Section */}
+      <View className="px-5 mt-6">
+        <View className="bg-primary rounded-2xl p-5 shadow-lg mb-6">
+          <Text className="text-white text-lg mb-1">Số dư ví của bạn</Text>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-3xl font-bold text-white">
+              {account.balance?.toLocaleString("vi-VN")}₫
+            </Text>
+            <MaterialCommunityIcons name="wallet-outline" size={36} color="white" />
+          </View>
+        </View>
+      </View>
+
       {/* Details */}
       <View className="px-5 py-6">
         <TouchableOpacity
@@ -52,11 +65,7 @@ export default function ProfileScreen() {
         {/* Email */}
         <InfoRow icon="email" label="Email" value={account.email} />
         {/* Phone */}
-        <InfoRow
-          icon="phone"
-          label="Số điện thoại"
-          value={detail.phoneNumber}
-        />
+        <InfoRow icon="phone" label="Số điện thoại" value={detail.phoneNumber} />
 
         {/* Customer fields */}
         {!isDriver && (
@@ -91,9 +100,7 @@ export default function ProfileScreen() {
             <InfoRow
               icon="event"
               label="Ngày hết hạn"
-              value={dayjs((detail as DriverDetail).licenseExpiry).format(
-                "DD/MM/YYYY"
-              )}
+              value={dayjs((detail as DriverDetail).licenseExpiry).format("DD/MM/YYYY")}
             />
             <InfoRow
               icon="business"
@@ -109,8 +116,7 @@ export default function ProfileScreen() {
             Lưu ý quan trọng:
           </Text>
           <Text className="text-sm text-blue-600">
-            Mọi thông tin cá nhân của bạn đều được bảo mật. Vui lòng liên hệ bộ
-            phận hỗ trợ nếu có bất kỳ thắc mắc nào.
+            Mọi thông tin cá nhân của bạn đều được bảo mật. Vui lòng liên hệ bộ phận hỗ trợ nếu có bất kỳ thắc mắc nào.
           </Text>
         </View>
       </View>
@@ -131,13 +137,16 @@ const InfoRow = ({
   multiline?: boolean;
 }) => {
   return (
-    <View
-      className={`flex-row items-start mb-4 p-4 bg-gray-100 rounded-lg shadow-xs`}
-    >
+    <View className="flex-row items-start mb-4 p-4 bg-gray-100 rounded-lg shadow-xs">
       <MaterialIcons name={icon} size={24} color={"#005cb8"} />
       <View className="ml-4 flex-1">
         <Text className="text-sm font-semibold text-gray-700">{label}</Text>
-        <Text className="text-base text-label">{value}</Text>
+        <Text
+          className={`text-base text-label ${multiline ? "mt-1" : ""}`}
+          numberOfLines={multiline ? 3 : 1}
+        >
+          {value}
+        </Text>
       </View>
     </View>
   );

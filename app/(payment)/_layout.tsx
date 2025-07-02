@@ -14,11 +14,7 @@ export default function StackLayout() {
       }}
     >
       <Stack.Screen name="index" options={{ title: "Xác nhận đơn hàng" }} />
-      <Stack.Screen
-        name="method"
-        options={{ title: "Phương thức thanh toán" }}
-      />
-      <Stack.Screen name="paid" options={{ title: "Thanh toán thành công" }} />
+      <Stack.Screen name="paid" options={{ title: "Thanh toán đơn hàng" }} />
     </Stack>
   );
 }

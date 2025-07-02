@@ -7,7 +7,7 @@ const ChatHeader = () => {
   const router = useRouter(); // hook điều hướng
 
   return (
-    <View className="flex-row justify-between items-center px-4 py-2 pt-10 bg-subtle">
+    <View className="flex-row justify-between items-center px-4 py-2 pt-10 bg-primary">
       {/* Bên trái: Mũi tên Back + Avatar + Tên */}
       <View className="flex-row items-center gap-x-2">
         <TouchableOpacity onPress={() => router.back()}>

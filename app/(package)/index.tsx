@@ -74,7 +74,7 @@ export default function YourPackageScreen() {
   };
 
   const handleLoadMore = () => {
-    if (!loading && hasMore && !isFetchingMore && safePackages.length > 0) {
+    if (!isFetchingMore && hasMore && safePackages.length > 0) {
       console.log("handleLoadMore triggered", {
         page,
         hasMore,
@@ -85,9 +85,9 @@ export default function YourPackageScreen() {
       fetchPackages(nextPage);
     } else {
       console.warn("handleLoadMore skipped", {
-        loading,
         hasMore,
         isFetchingMore,
+        loading, // chỉ log thôi, không check điều kiện
       });
     }
   };

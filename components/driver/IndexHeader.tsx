@@ -94,7 +94,7 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
         <Animated.View
           style={[
             StyleSheet.absoluteFillObject,
-            { backgroundColor: "#007bff", opacity: overlayOpacity },
+            { backgroundColor: "#005cb8", opacity: overlayOpacity },
           ]}
         />
         <View className="flex-row justify-between items-center">
@@ -174,7 +174,7 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
               <Ionicons
                 name="search"
                 size={24}
-                color="#007bff"
+                color="#005cb8"
                 className="px-2"
               />
               <TextInput
@@ -187,7 +187,7 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
                 <Ionicons
                   name="scan"
                   size={24}
-                  color="#007bff"
+                  color="#005cb8"
                   className="px-2"
                 />
               </TouchableOpacity>

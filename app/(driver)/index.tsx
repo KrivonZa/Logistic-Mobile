@@ -21,7 +21,7 @@ const HomeScreen = () => {
   const quickActions = [
     {
       key: "book",
-      label: "Nhận đơn hàng",
+      label: "Đơn hàng",
       image: require("@/assets/images/icons/ticket.png"),
       onPress: () => console.log("Chuyển đến Nhận đơn hàng"),
     },

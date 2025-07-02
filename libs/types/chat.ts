@@ -1,4 +1,6 @@
 export interface Message {
+  avatarReceiver: string;
+  avatarSender: string;
   messageID: string;
   senderName: string;
   senderID: string;
@@ -10,6 +12,8 @@ export interface Message {
 }
 
 export interface Conversations {
+  avatarReceiver: string;
+  avatarSender: string;
   messageID: string;
   senderName: string;
   senderID: string;

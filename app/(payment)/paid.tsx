@@ -1,8 +1,31 @@
-import { WebView } from 'react-native-webview';
+import { useLocalSearchParams, router } from "expo-router";
+import { WebView } from "react-native-webview";
+import { View } from "react-native";
 
-export default function Paid(){
-    return (
-        <WebView className='flex-1'
-      source={{ uri: 'https://vi.wikipedia.org/wiki/Trang_Ch%C3%ADnh' }}/>
-    );
+export default function Paid() {
+  const { checkoutUrl, orderID } = useLocalSearchParams<{
+    checkoutUrl: string;
+    orderID: string;
+  }>();
+
+  const handleRedirect = (url: string) => {
+    if (
+      url.startsWith("https://www.google.com/") ||
+      url.startsWith("https://vi.wikipedia.org/")
+    ) {
+      router.replace("/(tabs)/order");
+    }
+  };
+
+  return (
+    <View className="flex-1">
+      <WebView
+        source={{ uri: checkoutUrl }}
+        javaScriptEnabled
+        onNavigationStateChange={(navState) => {
+          handleRedirect(navState.url);
+        }}
+      />
+    </View>
+  );
 }

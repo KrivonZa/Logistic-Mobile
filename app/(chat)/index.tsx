@@ -1,21 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import { socket } from "@/libs/thirdParty/socket/socket";
+import { useFocusEffect } from "@react-navigation/native";
 
+import { socket } from "@/libs/thirdParty/socket/socket";
 import { conversation } from "@/libs/stores/chatManager/thunk";
-import { Conversations } from "@/libs/types/chat";
 import { useChat } from "@/libs/hooks/useChat";
 import { useAppDispatch } from "@/libs/stores";
-
-import { useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
 import { clearConversation } from "@/libs/stores/chatManager/slice";
+import { useAuth } from "@/libs/context/AuthContext";
+import { Conversations } from "@/libs/types/chat";
 
 export default function ConversationListScreen() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { loading, conversations } = useChat();
+  const { user } = useAuth(); // 👈 giả sử bạn có useAuth lấy ra accountID người dùng hiện tại
 
   const handlePress = (item: Conversations) => {
     const { conversationID, senderID, receiverID } = item;
@@ -38,7 +38,6 @@ export default function ConversationListScreen() {
     socket.connect();
 
     socket.on("conversation_updated", () => {
-      // Gọi lại API để cập nhật danh sách hội thoại
       dispatch(conversation());
     });
 
@@ -47,6 +46,16 @@ export default function ConversationListScreen() {
       socket.disconnect();
     };
   }, []);
+
+  const getAvatar = (item: Conversations) =>
+    item.senderID === user?.account.accountID
+      ? item.avatarReceiver
+      : item.avatarSender;
+
+  const getDisplayName = (item: Conversations) =>
+    item.senderID === user?.account.accountID
+      ? item.receiverName
+      : item.senderName;
 
   return (
     <View className="flex-1 bg-white p-4">
@@ -59,13 +68,13 @@ export default function ConversationListScreen() {
             onPress={() => handlePress(item)}
           >
             <Image
-              source={{
-                uri: "https://img.freepik.com/free-photo/close-up-upset-american-black-person_23-2148749582.jpg?semt=ais_hybrid&w=740",
-              }}
+              source={{ uri: getAvatar(item) }}
               className="w-12 h-12 rounded-full mr-4"
             />
             <View className="flex-1">
-              <Text className="text-base font-semibold">{item.senderName}</Text>
+              <Text className="text-base font-semibold">
+                {getDisplayName(item)}
+              </Text>
               <Text className="text-gray-500 text-sm" numberOfLines={1}>
                 {item.content}
               </Text>

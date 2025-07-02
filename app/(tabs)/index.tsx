@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import AnimatedHeader from "@/components/tabs/IndexHeader";
 import YourLocation from "@/components/tabs/YourLocation";
-import OrderNow from "@/components/tabs/OrderNow";
 import { useRouter } from "expo-router";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
@@ -87,7 +86,6 @@ const HomeScreen = () => {
         </View>
 
         <YourLocation />
-        <OrderNow />
       </Animated.ScrollView>
     </View>
   );

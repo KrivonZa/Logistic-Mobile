@@ -16,6 +16,7 @@ export interface Account {
   email: string;
   fullName: string;
   avatar?: string;
+  balance: number;
   role: "Customer" | "Driver";
 }
 

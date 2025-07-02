@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StatusBar,
 } from "react-native";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAppDispatch } from "@/libs/stores";
@@ -14,7 +14,6 @@ import { getPackageByID } from "@/libs/stores/packageManager/thunk";
 import { usePackage } from "@/libs/hooks/usePackage";
 
 export default function ItemDetailScreen() {
-  const navigation = useNavigation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const { packageDetail } = usePackage();
