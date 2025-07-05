@@ -83,6 +83,10 @@ export default function OrderScreen() {
                     ? "bg-green-100 text-green-600"
                     : item.status === "unpaid"
                     ? "bg-orange-100 text-orange-600"
+                    : item.status === "paid"
+                    ? "bg-emerald-100 text-emerald-600"
+                    : item.status === "scheduled"
+                    ? "bg-indigo-100 text-indigo-600"
                     : item.status === "reject" || item.status === "canceled"
                     ? "bg-red-100 text-red-600"
                     : "bg-gray-100 text-gray-500"
@@ -94,6 +98,10 @@ export default function OrderScreen() {
                       return "Đang chờ";
                     case "unpaid":
                       return "Chưa thanh toán";
+                    case "paid":
+                      return "Đã thanh toán";
+                    case "scheduled":
+                      return "Đã lên lịch";
                     case "in_progress":
                       return "Đang giao";
                     case "delivered":

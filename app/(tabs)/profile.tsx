@@ -88,34 +88,6 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </Link>
 
-        <Link href="/(profile)/order-history" asChild>
-          <TouchableOpacity className="bg-gray-100 px-5 py-4 rounded-2xl shadow-sm">
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center gap-x-4">
-                <MaterialIcons name="history" size={28} color="#2A2A2A" />
-                <Text className="text-xl font-medium text-label">
-                  Lịch sử đơn hàng
-                </Text>
-              </View>
-              <MaterialIcons name="chevron-right" size={28} color="#9CA3AF" />
-            </View>
-          </TouchableOpacity>
-        </Link>
-
-        <Link href="/(profile)/order-history" asChild>
-          <TouchableOpacity className="bg-gray-100 px-5 py-4 rounded-2xl shadow-sm">
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center gap-x-4">
-                <MaterialIcons name="history" size={28} color="#2A2A2A" />
-                <Text className="text-xl font-medium text-label">
-                  Lịch sử giao dịch
-                </Text>
-              </View>
-              <MaterialIcons name="chevron-right" size={28} color="#9CA3AF" />
-            </View>
-          </TouchableOpacity>
-        </Link>
-
         <TouchableOpacity
           className="bg-gray-100 px-5 py-4 rounded-2xl shadow-sm mt-4"
           onPress={() => {

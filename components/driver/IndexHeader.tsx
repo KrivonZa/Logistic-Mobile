@@ -1,8 +1,6 @@
 import React from "react";
 import {
   View,
-  Text,
-  Image,
   TouchableOpacity,
   ImageBackground,
   Animated,
@@ -11,7 +9,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import { useAuth } from "@/libs/context/AuthContext";
 
 type Props = {
@@ -26,7 +24,6 @@ const AnimatedImageBackground =
   Animated.createAnimatedComponent(ImageBackground);
 
 const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
-  const router = useRouter();
   const { user } = useAuth();
 
   const headerHeight = scrollY.interpolate({

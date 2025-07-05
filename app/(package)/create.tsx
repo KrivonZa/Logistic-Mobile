@@ -70,7 +70,7 @@ export default function CreatePackage() {
         [
           {
             text: "OK",
-            onPress: () => router.push("/(package)"),
+            onPress: () => router.push("/package"),
           },
         ],
         { cancelable: false }

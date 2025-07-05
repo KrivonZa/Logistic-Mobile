@@ -51,18 +51,16 @@ export default function TabLayout() {
       <Tabs.Screen
         name="delivery"
         options={{
+          headerStyle: {
+            backgroundColor: "#005cb8",
+          },
+          headerShown: true,
+          headerTitle: "Đơn vận chuyển",
+          headerTintColor: "#fff",
+          headerTitleAlign: "center",
           title: "Đơn vận chuyển",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="shippingbox.fill" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="trip"
-        options={{
-          title: "Chuyến xe",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="truck.box.fill" color={color} />
           ),
         }}
       />
