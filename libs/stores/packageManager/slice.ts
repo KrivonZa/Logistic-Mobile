@@ -4,6 +4,7 @@ import {
   getAllPackageByCustomer,
   getPackageByID,
   createPackage,
+  updatePackage,
 } from "./thunk";
 import { Package } from "@/libs/types/package";
 
@@ -76,6 +77,15 @@ export const managePackageSlice = createSlice({
         state.loading = false;
       })
       .addCase(createPackage.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(updatePackage.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updatePackage.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(updatePackage.rejected, (state) => {
         state.loading = false;
       });
   },

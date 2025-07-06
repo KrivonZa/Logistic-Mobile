@@ -18,4 +18,12 @@ export const managePackage = {
         "Content-Type": "multipart/form-data",
       },
     }),
+  updatedPackage: (formData: FormData) => {
+    const packageID = formData.get("packageID");
+    return api.patch(`/package-handler/${packageID}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
 };

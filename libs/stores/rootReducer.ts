@@ -5,6 +5,7 @@ import { manageRouteReducer } from "./routeManager/slice";
 import { managePackageReducer } from "./packageManager/slice";
 import { manageOrderDeliveryReducer } from "./orderManager/slice";
 import { manageTripReducer } from "./tripManager/slice";
+import { manageRatingReducer } from "./ratingManager/slice";
 
 export const rootReducer = combineReducers({
   manageAuthen: manageAuthenReducer,
@@ -13,4 +14,5 @@ export const rootReducer = combineReducers({
   managePackage: managePackageReducer,
   manageOrderDelivery: manageOrderDeliveryReducer,
   manageTrip: manageTripReducer,
+  manageRating: manageRatingReducer,
 });

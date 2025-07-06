@@ -23,6 +23,7 @@ export default function StackLayout() {
         }}
       />
       <Stack.Screen name="create" options={{ title: "Tạo hàng hóa" }} />
+      <Stack.Screen name="update" options={{ title: "Cập nhật hàng hóa" }} />
       <Stack.Screen name="[id]" options={{ title: "Chi tiết hàng hóa" }} />
     </Stack>
   );

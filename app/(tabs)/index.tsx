@@ -22,21 +22,21 @@ const HomeScreen = () => {
   const quickActions = [
     {
       key: "book",
-      label: "Đặt Chuyến",
+      label: "Đặt chuyến",
       image: require("@/assets/images/icons/ticket.png"),
       onPress: () => router.push("/(search)"),
     },
     {
       key: "track",
-      label: "Theo Dõi Đơn",
+      label: "Theo dõi đơn",
       image: require("@/assets/images/icons/tracking.png"),
-      onPress: () => console.log("Navigate to Theo Dõi Đơn"),
+      onPress: () => router.push("/(tabs)/order"),
     },
     {
       key: "review",
-      label: "Đánh Giá",
+      label: "Đánh giá App",
       image: require("@/assets/images/icons/rating.png"),
-      onPress: () => console.log("Navigate to Đánh Giá"),
+      onPress: () => router.push("/(rating)"),
     },
   ];
 

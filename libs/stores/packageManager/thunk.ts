@@ -63,3 +63,17 @@ export const createPackage = createAsyncThunk(
     }
   }
 );
+
+export const updatePackage = createAsyncThunk(
+  "package/update",
+  async (req: FormData, { rejectWithValue }) => {
+    try {
+      const response = await managePackage.updatedPackage(req);
+      return response.data;
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message || error.message || "Đã xảy ra lỗi";
+      return rejectWithValue(message);
+    }
+  }
+);

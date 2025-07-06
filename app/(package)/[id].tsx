@@ -12,11 +12,13 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAppDispatch } from "@/libs/stores";
 import { getPackageByID } from "@/libs/stores/packageManager/thunk";
 import { usePackage } from "@/libs/hooks/usePackage";
+import { useRouter } from "expo-router";
 
 export default function ItemDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const { packageDetail } = usePackage();
+  const router = useRouter();
 
   useEffect(() => {
     if (id) {
@@ -148,7 +150,12 @@ export default function ItemDetailScreen() {
         </View>
 
         <View className="px-4 pb-4">
-          <TouchableOpacity className="bg-primary py-3 rounded-lg flex-row items-center justify-center mb-3">
+          <TouchableOpacity
+            onPress={() =>
+              router.push({ pathname: "/(package)/update", params: { id } })
+            }
+            className="bg-primary py-3 rounded-lg flex-row items-center justify-center mb-3"
+          >
             <MaterialCommunityIcons name="pencil" size={20} color="#fff" />
             <Text className="text-white text-base font-bold ml-2">
               Chỉnh sửa kiện hàng

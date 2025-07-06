@@ -11,25 +11,27 @@ import {
 import AnimatedHeader from "@/components/driver/IndexHeader";
 import YourLocation from "@/components/tabs/YourLocation";
 import OrderNow from "@/components/tabs/OrderNow";
+import { useRouter } from "expo-router";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const HEADER_MAX_HEIGHT = SCREEN_HEIGHT / 3.5;
 
 const HomeScreen = () => {
   const scrollY = useRef(new Animated.Value(0)).current;
+  const router = useRouter();
 
   const quickActions = [
     {
       key: "book",
       label: "Đơn hàng",
       image: require("@/assets/images/icons/ticket.png"),
-      onPress: () => console.log("Chuyển đến Nhận đơn hàng"),
+      onPress: () => router.push("/(driver)/delivery"),
     },
     {
       key: "review",
-      label: "Phản hồi khách",
+      label: "Đánh giá App",
       image: require("@/assets/images/icons/rating.png"),
-      onPress: () => console.log("Chuyển đến Phản hồi khách"),
+      onPress: () => router.push("/(rating)"),
     },
   ];
 
