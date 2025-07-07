@@ -1,17 +1,14 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { manageAuthen } from "@/libs/services/manageAuthen";
-import { Login, Register } from "@/libs/types/account";
-import * as SecureStore from "expo-secure-store";
-import { parseJwt } from "@/libs/utils/auth";
+import { manageAccount } from "@/libs/services/manageAccount";
 
-export const register = createAsyncThunk(
-  "auth/register",
-  async (req: Register, { rejectWithValue }) => {
+export const updateAccount = createAsyncThunk(
+  "account/update",
+  async (formData: FormData, { rejectWithValue }) => {
     try {
-      const response = await manageAuthen.register(req);
+      const response = await manageAccount.updateAccount(formData);
       return response.data;
     } catch (error) {
-      return rejectWithValue("Đăng ký không thành công.");
+      return rejectWithValue("Không thành công.");
     }
   }
 );

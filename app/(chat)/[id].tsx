@@ -6,10 +6,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   Text,
+  FlatList,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import debounce from "lodash/debounce";
+import * as SecureStore from "expo-secure-store";
+import { Ionicons } from "@expo/vector-icons";
 
 import { useAppDispatch } from "@/libs/stores";
 import {
@@ -17,11 +20,13 @@ import {
   addMessageToLocal,
 } from "@/libs/stores/chatManager/slice";
 import { message } from "@/libs/stores/chatManager/thunk";
-import { socket } from "@/libs/thirdParty/socket/socket";
+import { getSocket } from "@/libs/thirdParty/socket/socket";
 import { useChat } from "@/libs/hooks/useChat";
-import { Ionicons } from "@expo/vector-icons";
+
+import ChatHeader from "@/components/chat/ChatHeader";
 import MessageList from "@/components/chat/MessageList";
-import * as SecureStore from "expo-secure-store";
+
+import dayjs from "dayjs";
 
 export default function MessageScreen() {
   const dispatch = useAppDispatch();
@@ -32,14 +37,15 @@ export default function MessageScreen() {
   const [myUserID, setMyUserID] = useState<string | null>(null);
   const [isTyping, setIsTyping] = useState(false);
 
-  const flatListRef = useRef(null);
+  const flatListRef = useRef<FlatList<any>>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const actualReceiverID = myUserID === senderID ? receiverID : senderID;
 
   const handleTyping = useRef(
-    debounce(() => {
+    debounce(async () => {
       if (myUserID && actualReceiverID) {
+        const socket = await getSocket();
         socket.emit("typing", {
           conversationID: id,
           senderID: myUserID,
@@ -49,7 +55,6 @@ export default function MessageScreen() {
     }, 1000)
   ).current;
 
-  // Get user ID from SecureStore
   useEffect(() => {
     (async () => {
       const accountID = await SecureStore.getItemAsync("accountID");
@@ -57,7 +62,6 @@ export default function MessageScreen() {
     })();
   }, []);
 
-  // Fetch messages on focus
   useFocusEffect(
     useCallback(() => {
       if (!id) return;
@@ -66,68 +70,86 @@ export default function MessageScreen() {
     }, [id])
   );
 
-  // Socket room join/leave
   useEffect(() => {
-    if (!id) return;
+    if (!id || !myUserID) return;
+    let socketRef: any;
 
-    socket.emit("join_room", { conversationID: id });
-    return () => {
-      socket.emit("leave_room", { conversationID: id });
-    };
-  }, [id]);
+    const setupSocket = async () => {
+      const socket = await getSocket();
+      socketRef = socket;
 
-  // Join user room
-  useEffect(() => {
-    if (myUserID) {
+      socket.emit("join_room", { conversationID: id });
       socket.emit("join_user_room", { userID: myUserID });
-    }
-  }, [myUserID]);
 
-  // Init socket listeners
-  useEffect(() => {
-    socket.connect();
+      const handleReceiveMessage = (newMessage: any) => {
+        const fixedMessage = {
+          ...newMessage,
+          createdAt: dayjs(newMessage.createdAt).format("DD-MM-YYYY HH:mm"),
+        };
+        dispatch(addMessageToLocal(fixedMessage));
 
-    const handleReceiveMessage = (newMessage: any) => {
-      dispatch(addMessageToLocal(newMessage));
+        setTimeout(() => {
+          flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+        }, 100);
+      };
+
+      const handleTypingReceived = (data: any) => {
+        if (data?.conversationID === id && data.senderID !== myUserID) {
+          setIsTyping(true);
+          if (timeoutRef.current) clearTimeout(timeoutRef.current);
+          timeoutRef.current = setTimeout(() => setIsTyping(false), 2500);
+        }
+      };
+
+      const handleConversationUpdated = (data: any) => {
+        if (data?.conversationID === id) {
+          dispatch(message(`${id}`));
+        }
+      };
+
+      socket.on("receive_message", handleReceiveMessage);
+      socket.on("typing", handleTypingReceived);
+      socket.on("conversation_updated", handleConversationUpdated);
     };
 
-    const handleTypingReceived = (data: any) => {
-      if (data?.conversationID === id && data.senderID !== myUserID) {
-        setIsTyping(true);
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        timeoutRef.current = setTimeout(() => setIsTyping(false), 2500);
-      }
-    };
-
-    const handleConversationUpdated = (data: any) => {
-      if (data?.conversationID === id) {
-        dispatch(message(`${id}`));
-      }
-    };
-
-    socket.on("receive_message", handleReceiveMessage);
-    socket.on("typing", handleTypingReceived);
-    socket.on("conversation_updated", handleConversationUpdated);
+    setupSocket();
 
     return () => {
-      socket.off("receive_message", handleReceiveMessage);
-      socket.off("typing", handleTypingReceived);
-      socket.off("conversation_updated", handleConversationUpdated);
+      if (socketRef) {
+        socketRef.off("receive_message");
+        socketRef.off("typing");
+        socketRef.off("conversation_updated");
+      }
     };
   }, [id, myUserID]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim() || !myUserID || !actualReceiverID) return;
 
+    const socket = await getSocket();
     socket.emit("send_message", {
       conversationID: id,
-      senderID: myUserID,
       receiverID: actualReceiverID,
       content: input.trim(),
     });
 
     setInput("");
+
+    setTimeout(() => {
+      flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+    }, 100);
   };
+
+  const firstMessage = messages?.[0];
+  const isCurrentUserSender = firstMessage?.senderID === myUserID;
+
+  const chattingWithName = isCurrentUserSender
+    ? firstMessage?.receiverName
+    : firstMessage?.senderName;
+
+  const chattingWithAvatar = isCurrentUserSender
+    ? firstMessage?.avatarReceiver
+    : firstMessage?.avatarSender;
 
   return (
     <KeyboardAvoidingView
@@ -135,6 +157,10 @@ export default function MessageScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={80}
     >
+      <ChatHeader
+        name={chattingWithName || "Người dùng"}
+        avatar={chattingWithAvatar || "https://i.pravatar.cc/40"}
+      />
       <View className="flex-1 p-4">
         <MessageList
           messages={messages}

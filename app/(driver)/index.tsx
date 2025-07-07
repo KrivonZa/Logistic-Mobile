@@ -10,11 +10,10 @@ import {
 } from "react-native";
 import AnimatedHeader from "@/components/driver/IndexHeader";
 import YourLocation from "@/components/tabs/YourLocation";
-import OrderNow from "@/components/tabs/OrderNow";
 import { useRouter } from "expo-router";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
-const HEADER_MAX_HEIGHT = SCREEN_HEIGHT / 3.5;
+const HEADER_MAX_HEIGHT = SCREEN_HEIGHT / 5;
 
 const HomeScreen = () => {
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -73,7 +72,6 @@ const HomeScreen = () => {
         </View>
 
         <YourLocation />
-        <OrderNow />
       </Animated.ScrollView>
     </View>
   );

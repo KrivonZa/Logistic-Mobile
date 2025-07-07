@@ -31,7 +31,7 @@ export const manageChatSlice = createSlice({
         ...action.payload,
         createdAt: dayjs(action.payload.createdAt).format("DD-MM-YYYY HH:mm"),
       };
-      state.messages.unshift(formattedPayload);
+      state.messages = [...state.messages, formattedPayload];
     },
   },
   extraReducers: (builder) => {

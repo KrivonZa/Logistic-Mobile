@@ -38,6 +38,7 @@ export default function StackLayout() {
           ),
         }}
       />
+      <Stack.Screen name="edit" options={{ title: "Chỉnh sửa thông tin" }} />
     </Stack>
   );
 }

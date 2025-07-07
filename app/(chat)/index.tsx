@@ -82,6 +82,13 @@ export default function ConversationListScreen() {
             <Text className="text-xs text-gray-400 ml-2">{item.createdAt}</Text>
           </TouchableOpacity>
         )}
+        ListEmptyComponent={
+          <View className="flex-1 items-center justify-center mt-20">
+            <Text className="text-gray-400 text-base">
+              Không có đoạn chat nào.
+            </Text>
+          </View>
+        }
       />
     </View>
   );

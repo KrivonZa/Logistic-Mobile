@@ -1,6 +1,5 @@
 import { Stack } from "expo-router";
 import React from "react";
-import ChatHeader from "@/components/chat/ChatHeader";
 
 export default function StackLayout() {
   return (
@@ -18,9 +17,7 @@ export default function StackLayout() {
       <Stack.Screen
         name="[id]"
         options={{
-          title: "Tin nhắn",
-          headerTitleAlign: "left",
-          header: () => <ChatHeader />,
+          headerShown: false,
         }}
       />
     </Stack>

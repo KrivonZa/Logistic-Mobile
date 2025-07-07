@@ -1,11 +1,20 @@
 import { useEffect } from "react";
-import { View, Text, ScrollView, Image, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 import { useAppDispatch } from "@/libs/stores";
 import { useTrip } from "@/libs/hooks/useTrip";
 import { getTripByID } from "@/libs/stores/tripManager/thunk";
 import { useLocalSearchParams } from "expo-router";
 import { format } from "date-fns";
 import TripStatusUpdater from "@/components/driver/TripAction";
+import { useRouter } from "expo-router";
+import { getSocket } from "@/libs/thirdParty/socket/socket";
 
 interface InfoCardProps {
   title: string;
@@ -23,6 +32,7 @@ export default function DeliveryDetail() {
   const dispatch = useAppDispatch();
   const { loading, tripDetail } = useTrip();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
 
   useEffect(() => {
     if (id) dispatch(getTripByID(id));
@@ -50,6 +60,28 @@ export default function DeliveryDetail() {
 
   const formatDate = (date: string | null) =>
     date ? format(new Date(date), "dd/MM/yyyy HH:mm") : "Chưa có";
+
+  const handleChat = async (receiverID?: string) => {
+    if (!receiverID) return;
+
+    const socket = await getSocket();
+
+    if (!socket.connected) {
+      console.warn("⚠️ Socket chưa kết nối");
+      return;
+    }
+
+    socket.emit("send_message", {
+      receiverID,
+      content: "Chào bạn nhé!",
+    });
+
+    socket.once("message_sent", (message: any) => {
+      if (message?.conversationID) {
+        router.push(`/(chat)/${message.conversationID}`);
+      }
+    });
+  };
 
   return (
     <ScrollView className="flex-1 bg-gray-100 p-4">
@@ -131,22 +163,33 @@ export default function DeliveryDetail() {
       </InfoCard>
 
       <InfoCard title="Thông Tin Khách Hàng">
-        <Text className="text-base text-gray-700 mb-1">
-          <Text className="font-semibold">Họ tên:</Text>{" "}
-          {deliveryOrder.Customer.Account.fullName}
-        </Text>
-        <Text className="text-base text-gray-700 mb-1">
-          <Text className="font-semibold">SĐT:</Text>{" "}
-          {deliveryOrder.Customer.phoneNumber}
-        </Text>
-        <Text className="text-base text-gray-700 mb-1">
-          <Text className="font-semibold">Email:</Text>{" "}
-          {deliveryOrder.Customer.Account.email}
-        </Text>
-        <Text className="text-base text-gray-700">
-          <Text className="font-semibold">Địa chỉ:</Text>{" "}
-          {deliveryOrder.Customer.address}
-        </Text>
+        <View className="gap-y-1">
+          <Text className="text-base text-gray-700">
+            <Text className="font-semibold">Họ tên: </Text>
+            {deliveryOrder.Customer.Account.fullName}
+          </Text>
+          <Text className="text-base text-gray-700">
+            <Text className="font-semibold">SĐT: </Text>
+            {deliveryOrder.Customer.phoneNumber}
+          </Text>
+          <Text className="text-base text-gray-700">
+            <Text className="font-semibold">Email: </Text>
+            {deliveryOrder.Customer.Account.email}
+          </Text>
+          <Text className="text-base text-gray-700">
+            <Text className="font-semibold">Địa chỉ: </Text>
+            {deliveryOrder.Customer.address}
+          </Text>
+        </View>
+
+        <View className="mt-4 items-end">
+          <TouchableOpacity
+            className="bg-primary px-5 py-2 rounded-full"
+            onPress={() => handleChat(deliveryOrder.Customer.Account.accountID)}
+          >
+            <Text className="text-white text-sm font-medium">Liên hệ</Text>
+          </TouchableOpacity>
+        </View>
       </InfoCard>
 
       <InfoCard title="Điểm Nhận và Trả">

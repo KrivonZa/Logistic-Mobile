@@ -1,7 +1,10 @@
 import api from "@/libs/hooks/axiosInstance";
-import { Login, Register } from "@/libs/types/account";
 
-export const manageAuthen = {
-  login: (req: Login) => api.post(`/auth/login`, req),
-  register: (req: Register) => api.post(`/auth/register-customer`, req),
+export const manageAccount = {
+  updateAccount: (formData: FormData) =>
+    api.patch(`/account`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }),
 };

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { FlatList, View, Image, Text } from "react-native";
 import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";
@@ -40,7 +40,7 @@ type ListItem =
 interface Props {
   messages: MessageType[];
   myUserID: string | null;
-  flatListRef: React.RefObject<any>;
+  flatListRef: React.RefObject<FlatList<any>>;
 }
 
 export default function MessageList({
@@ -50,7 +50,7 @@ export default function MessageList({
 }: Props) {
   const now = dayjs();
 
-  const flatListData: ListItem[] = useMemo(() => {
+  const flatListData: ListItem[] = (() => {
     const groupedMessages = messages.reduce((acc, msg) => {
       const time = dayjs(msg.createdAt, "DD-MM-YYYY HH:mm", true);
       const dateKey = time.format("DD-MM-YYYY");
@@ -115,10 +115,12 @@ export default function MessageList({
             lastSenderID === msg.senderID &&
             lastMessageTime !== null &&
             msgTime.diff(lastMessageTime, "minute") <= 30;
+
           const nextMsg = sortedMsgs[idx + 1];
           const nextMsgTime = nextMsg
             ? dayjs(nextMsg.createdAt, "DD-MM-YYYY HH:mm")
             : null;
+
           const isLastInGroup =
             !nextMsg ||
             nextMsg.senderID !== msg.senderID ||
@@ -139,7 +141,7 @@ export default function MessageList({
       });
 
     return flatData.reverse();
-  }, [messages]);
+  })();
 
   return (
     <FlatList

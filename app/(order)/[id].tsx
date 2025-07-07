@@ -11,7 +11,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAppDispatch } from "@/libs/stores";
 import { detailOrderDelivery } from "@/libs/stores/orderManager/thunk";
 import { useOrder } from "@/libs/hooks/useOrder";
-import { socket } from "@/libs/thirdParty/socket/socket";
+import { getSocket } from "@/libs/thirdParty/socket/socket";
 
 export default function OrderDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -73,10 +73,12 @@ export default function OrderDetail() {
     detailOrder.status === "unpaid" &&
     (!transaction || transaction.status !== "PAID");
 
-  const handleChat = (receiverID?: string) => {
+  const handleChat = async (receiverID?: string) => {
     if (!receiverID) return;
 
-    if (!socket?.connected) {
+    const socket = await getSocket(); // 👈 GIỐNG như trong MessageScreen
+
+    if (!socket.connected) {
       console.warn("⚠️ Socket chưa kết nối");
       return;
     }

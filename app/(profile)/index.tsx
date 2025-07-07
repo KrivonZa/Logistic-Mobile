@@ -1,5 +1,6 @@
 import { Text, View, ScrollView, Image, TouchableOpacity } from "react-native";
-import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useUser } from "@/libs/context/AuthContext";
 import { DriverDetail, CustomerDetail } from "@/libs/types/account";
 import dayjs from "dayjs";
@@ -7,10 +8,10 @@ import dayjs from "dayjs";
 export default function ProfileScreen() {
   const user = useUser();
   if (!user) return null;
+  const router = useRouter();
 
   const { account } = user;
   const detail = account.detail;
-
   const isDriver = account.role === "Driver";
   const avatarUrl = account.avatar || "https://i.pravatar.cc/150";
 
@@ -24,10 +25,13 @@ export default function ProfileScreen() {
             className="w-32 h-32 rounded-full border-4 border-primary"
           />
           <TouchableOpacity
-            className="absolute bottom-0 right-0 bg-primary p-2 rounded-full border-2 border-white shadow"
-            onPress={() => console.log("Edit avatar")}
+            className="absolute top-0 right-0 bg-gray-100 p-2 rounded-full shadow-sm z-10"
+            onPress={() => {
+              console.log("Go to edit");
+              router.push("/edit");
+            }}
           >
-            <MaterialIcons name="camera-alt" size={20} color="white" />
+            <MaterialIcons name="edit" size={20} color="#005cb8" />
           </TouchableOpacity>
         </View>
         <Text className="text-2xl font-bold text-label mb-1">
@@ -36,28 +40,8 @@ export default function ProfileScreen() {
         <Text className="text-base text-gray-500">Thông tin cá nhân</Text>
       </View>
 
-      {/* Wallet Section */}
-      <View className="px-5 mt-6">
-        <View className="bg-primary rounded-2xl p-5 shadow-lg mb-6">
-          <Text className="text-white text-lg mb-1">Số dư ví của bạn</Text>
-          <View className="flex-row items-center justify-between">
-            <Text className="text-3xl font-bold text-white">
-              {account.balance?.toLocaleString("vi-VN")}₫
-            </Text>
-            <MaterialCommunityIcons name="wallet-outline" size={36} color="white" />
-          </View>
-        </View>
-      </View>
-
-      {/* Details */}
+      {/* Chi tiết tài khoản */}
       <View className="px-5 py-6">
-        <TouchableOpacity
-          className="absolute top-4 right-4 bg-gray-100 p-2 rounded-full shadow-sm"
-          onPress={() => console.log("Edit user info")}
-        >
-          <MaterialIcons name="edit" size={20} color={"#005cb8"} />
-        </TouchableOpacity>
-
         <Text className="text-xl font-bold text-label mb-5">
           Chi tiết tài khoản
         </Text>
@@ -65,18 +49,20 @@ export default function ProfileScreen() {
         {/* Email */}
         <InfoRow icon="email" label="Email" value={account.email} />
         {/* Phone */}
-        <InfoRow icon="phone" label="Số điện thoại" value={detail.phoneNumber} />
+        <InfoRow
+          icon="phone"
+          label="Số điện thoại"
+          value={detail.phoneNumber}
+        />
 
         {/* Customer fields */}
         {!isDriver && (
-          <>
-            <InfoRow
-              icon="location-on"
-              label="Địa chỉ"
-              value={(detail as CustomerDetail).address}
-              multiline
-            />
-          </>
+          <InfoRow
+            icon="location-on"
+            label="Địa chỉ"
+            value={(detail as CustomerDetail).address}
+            multiline
+          />
         )}
 
         {/* Driver fields */}
@@ -100,7 +86,9 @@ export default function ProfileScreen() {
             <InfoRow
               icon="event"
               label="Ngày hết hạn"
-              value={dayjs((detail as DriverDetail).licenseExpiry).format("DD/MM/YYYY")}
+              value={dayjs((detail as DriverDetail).licenseExpiry).format(
+                "DD/MM/YYYY"
+              )}
             />
             <InfoRow
               icon="business"
@@ -116,7 +104,8 @@ export default function ProfileScreen() {
             Lưu ý quan trọng:
           </Text>
           <Text className="text-sm text-blue-600">
-            Mọi thông tin cá nhân của bạn đều được bảo mật. Vui lòng liên hệ bộ phận hỗ trợ nếu có bất kỳ thắc mắc nào.
+            Mọi thông tin cá nhân của bạn đều được bảo mật. Vui lòng liên hệ bộ
+            phận hỗ trợ nếu có bất kỳ thắc mắc nào.
           </Text>
         </View>
       </View>

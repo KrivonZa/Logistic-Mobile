@@ -39,9 +39,7 @@ export default function RootLayout() {
           socketInstance.on("connect", () => {
             console.log("🔌 Socket connected:", socketInstance.id);
           });
-        } catch (err) {
-          console.error("❌ Failed to connect socket:", err);
-        }
+        } catch {}
       })();
     }
   }, [loaded]);

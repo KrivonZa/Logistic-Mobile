@@ -46,3 +46,26 @@ export interface User {
     detail: CustomerDetail | DriverDetail;
   };
 }
+
+export interface UpdateCustomerRequest {
+  fullName?: string;
+  phoneNumber?: string;
+  address?: string;
+}
+
+export interface UpdateDriverRequest {
+  fullName?: string;
+  phoneNumber?: string;
+  identityNumber?: string;
+  licenseNumber?: string;
+  licenseLevel?: string;
+  licenseExpiry?: string;
+}
+
+export interface UpdateAccountRequest {
+  email?: string;
+  fullName?: string;
+  avatar?: string;
+  customer?: UpdateCustomerRequest;
+  driver?: UpdateDriverRequest;
+}
