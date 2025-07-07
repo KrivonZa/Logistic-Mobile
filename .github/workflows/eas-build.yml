@@ -19,20 +19,18 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "20"  # Sử dụng Node.js v20
+          node-version: "20" # Sử dụng Node.js v20
 
       # Step 3: Cài đặt dependencies
       - name: Install dependencies
         run: |
           npm install
-          npm install -g eas-cli@latest
+          npm install -g expo-cli@latest
 
       # Step 4: Đăng nhập vào Expo bằng token (thông qua biến môi trường)
-      - name: Login to EAS
-        run: eas login
-        env:
-          EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}  # Sử dụng token từ GitHub Secrets
+      - name: Login to Expo
+        run: expo login --token ${{ secrets.EXPO_ACCESS_TOKEN }} # Sử dụng token Expo để đăng nhập
 
-      # Step 5: Chạy lệnh build
+      # Step 5: Chạy lệnh build với EAS
       - name: Run EAS build
         run: eas build --platform android --profile production
