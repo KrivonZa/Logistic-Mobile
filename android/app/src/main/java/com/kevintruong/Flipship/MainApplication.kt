@@ -1,4 +1,4 @@
-package com.testertesting9112001.Flipship
+package com.kevintruong.Flipship
 
 import android.app.Application
 import android.content.res.Configuration

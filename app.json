@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Flipship",
-    "slug": "Flipship",
+    "slug": "flipship",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -21,7 +21,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#005CB8"
       },
-      "package": "com.testertesting9112001.Flipship"
+      "package": "com.kevintruong.Flipship"
     },
     "web": {
       "bundler": "metro",
@@ -49,7 +49,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "77f3f710-05ce-4961-95a2-382971f1b581"
+        "projectId": "16df6fcd-8416-4ad6-84de-77ec0ccf07c3"
       }
     }
   }

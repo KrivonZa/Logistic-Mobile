@@ -36,19 +36,3 @@ useExpoModules()
 
 include ':app'
 includeBuild(new File(["node", "--print", "require.resolve('@react-native/gradle-plugin/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim()).getParentFile())
-
-def loadDotEnv() {
-    def envFile = new File(rootDir, ".env")
-    if (envFile.exists()) {
-        envFile.eachLine { line ->
-            def parts = line.split("=")
-            if (parts.length == 2) {
-                def key = parts[0].trim()
-                def value = parts[1].trim()
-                gradle.ext.set(key, value)
-            }
-        }
-    }
-}
-
-loadDotEnv()

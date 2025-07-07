@@ -1,4 +1,4 @@
-package com.testertesting9112001.Flipship
+package com.kevintruong.Flipship
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build
