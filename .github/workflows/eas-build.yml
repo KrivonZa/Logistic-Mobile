@@ -10,20 +10,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 🔁 Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
+      - name: 🧱 Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "20" # Chọn version Node.js tương thích
+          node-version: "20"
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies and EAS CLI
         run: |
-          npm install
+          npm ci
           npm install -g eas-cli
 
-      - name: Run EAS build
-        run: eas build --platform android --profile production
+      - name: 🔐 Check EXPO_ACCESS_TOKEN is available
+        run: |
+          if [ -z "${EXPO_ACCESS_TOKEN}" ]; then
+            echo "❌ Missing EXPO_ACCESS_TOKEN"
+            exit 1
+          else
+            echo "✅ EXPO_ACCESS_TOKEN found"
+          fi
         env:
-          EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }} # Đảm bảo token từ GitHub Secret
+          EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
+
+      - name: 🚀 Run EAS Build (Android)
+        run: eas build --platform android --profile production --non-interactive
+        env:
+          EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
