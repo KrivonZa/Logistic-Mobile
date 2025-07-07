@@ -24,11 +24,16 @@ export const getCreatedOrderDelivery = createAsyncThunk(
       page = 1,
       limit = 10,
       isLoadMore = false,
-    }: { page?: number; limit?: number; isLoadMore?: boolean },
+      status,
+    }: { page?: number; limit?: number; isLoadMore?: boolean; status?: string },
     { rejectWithValue }
   ) => {
     try {
-      const response = await manageOrder.getCreatedOrder({ page, limit });
+      const response = await manageOrder.getCreatedOrder({
+        page,
+        limit,
+        status,
+      });
       return {
         data: response.data.data,
         page: response.data.page,

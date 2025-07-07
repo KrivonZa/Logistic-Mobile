@@ -40,6 +40,32 @@ export interface Transaction {
   status: string;
 }
 
+export interface Driver {
+  driverID: string;
+  accountID: string;
+  fullName: string;
+  phoneNumber: string;
+  licenseNumber: string;
+}
+
+export interface Vehicle {
+  vehicleID: string;
+  vehicleNumber: string;
+  vehicleImage: string;
+  loadCapacity: number;
+}
+
+export interface Trip {
+  tripID: string;
+  status: string;
+  dueTime: string;
+  startTime?: string | null;
+  endTime?: string | null;
+  createdAt: string;
+  driver?: Driver | null;
+  vehicle?: Vehicle | null;
+}
+
 export interface OrderDelivery {
   orderID: string;
   customerID: string;
@@ -61,4 +87,5 @@ export interface OrderDelivery {
   createdAt: string;
   updatedAt: string;
   transaction?: Transaction | null;
+  trip?: Trip | null;
 }

@@ -15,7 +15,7 @@ export default function ConversationListScreen() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { loading, conversations } = useChat();
-  const { user } = useAuth(); // 👈 giả sử bạn có useAuth lấy ra accountID người dùng hiện tại
+  const { user } = useAuth();
 
   const handlePress = (item: Conversations) => {
     const { conversationID, senderID, receiverID } = item;
@@ -35,15 +35,15 @@ export default function ConversationListScreen() {
   );
 
   useEffect(() => {
-    socket.connect();
+    socket?.connect();
 
-    socket.on("conversation_updated", () => {
+    socket?.on("conversation_updated", () => {
       dispatch(conversation());
     });
 
     return () => {
-      socket.off("conversation_updated");
-      socket.disconnect();
+      socket?.off("conversation_updated");
+      socket?.disconnect();
     };
   }, []);
 

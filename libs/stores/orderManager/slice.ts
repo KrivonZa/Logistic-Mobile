@@ -60,7 +60,6 @@ export const manageOrderDeliverySlice = createSlice({
         state.loading = true;
       })
       .addCase(detailOrderDelivery.fulfilled, (state, action) => {
-        console.log(action.payload.data);
         state.loading = false;
         state.detailOrder = action.payload.data;
       })

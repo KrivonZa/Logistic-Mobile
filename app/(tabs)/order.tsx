@@ -6,11 +6,24 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Image,
+  ScrollView,
 } from "react-native";
 import { useAppDispatch } from "@/libs/stores";
 import { getCreatedOrderDelivery } from "@/libs/stores/orderManager/thunk";
 import { useOrder } from "@/libs/hooks/useOrder";
 import { useRouter } from "expo-router";
+
+const STATUS_OPTIONS = [
+  { label: "Tất cả", value: undefined },
+  { label: "Chờ duyệt", value: "pending" },
+  { label: "Chưa thanh toán", value: "unpaid" },
+  { label: "Đã thanh toán", value: "paid" },
+  { label: "Đã lên lịch", value: "scheduled" },
+  { label: "Đang giao", value: "in_progress" },
+  { label: "Đã giao", value: "delivered" },
+  { label: "Từ chối", value: "reject" },
+  { label: "Đã hủy", value: "canceled" },
+];
 
 export default function OrderScreen() {
   const dispatch = useAppDispatch();
@@ -19,15 +32,18 @@ export default function OrderScreen() {
   const limit = 10;
 
   const [refreshing, setRefreshing] = useState(false);
+  const [status, setStatus] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    dispatch(getCreatedOrderDelivery({ page: 1, limit, isLoadMore: false }));
-  }, []);
+    dispatch(
+      getCreatedOrderDelivery({ page: 1, limit, isLoadMore: false, status })
+    );
+  }, [status]);
 
   const onRefresh = async () => {
     setRefreshing(true);
     await dispatch(
-      getCreatedOrderDelivery({ page: 1, limit, isLoadMore: false })
+      getCreatedOrderDelivery({ page: 1, limit, isLoadMore: false, status })
     );
     setRefreshing(false);
   };
@@ -35,7 +51,12 @@ export default function OrderScreen() {
   const loadMore = () => {
     if (orderDeliveries.length >= total || loading) return;
     dispatch(
-      getCreatedOrderDelivery({ page: page + 1, limit, isLoadMore: true })
+      getCreatedOrderDelivery({
+        page: page + 1,
+        limit,
+        isLoadMore: true,
+        status,
+      })
     );
   };
 
@@ -53,7 +74,7 @@ export default function OrderScreen() {
             {imageUri ? (
               <Image
                 source={{ uri: imageUri }}
-                className="w-full h-full object-cover"
+                className="w-full h-full"
                 resizeMode="cover"
               />
             ) : (
@@ -164,7 +185,39 @@ export default function OrderScreen() {
   };
 
   return (
-    <View className="flex-1 bg-gray-100 pt-4 pb-20">
+    <View className="bg-gray-100 pt-4 pb-20">
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingTop: 8,
+          paddingBottom: 24,
+          alignItems: "center",
+        }}
+      >
+        {STATUS_OPTIONS.map((option) => (
+          <TouchableOpacity
+            key={option.value ?? "all"}
+            onPress={() => setStatus(option.value)}
+            className={`px-3 py-3 mr-2 rounded-full border ${
+              status === option.value
+                ? "bg-blue-600 border-blue-600"
+                : "bg-white border-gray-300"
+            }`}
+          >
+            <Text
+              numberOfLines={1}
+              className={`text-base font-medium truncate ${
+                status === option.value ? "text-white" : "text-gray-700"
+              }`}
+            >
+              {option.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
       {loading && page === 1 ? (
         <ActivityIndicator size="large" color="#3b82f6" className="mt-10" />
       ) : (

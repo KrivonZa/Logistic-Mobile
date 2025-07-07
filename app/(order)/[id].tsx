@@ -11,6 +11,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAppDispatch } from "@/libs/stores";
 import { detailOrderDelivery } from "@/libs/stores/orderManager/thunk";
 import { useOrder } from "@/libs/hooks/useOrder";
+import { socket } from "@/libs/thirdParty/socket/socket";
 
 export default function OrderDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -71,6 +72,26 @@ export default function OrderDetail() {
   const showPaymentButton =
     detailOrder.status === "unpaid" &&
     (!transaction || transaction.status !== "PAID");
+
+  const handleChat = (receiverID?: string) => {
+    if (!receiverID) return;
+
+    if (!socket?.connected) {
+      console.warn("⚠️ Socket chưa kết nối");
+      return;
+    }
+
+    socket.emit("send_message", {
+      receiverID,
+      content: "Chào bạn nhé!",
+    });
+
+    socket.once("message_sent", (message: any) => {
+      if (message?.conversationID) {
+        router.push(`/(chat)/${message.conversationID}`);
+      }
+    });
+  };
 
   return (
     <ScrollView className="flex-1 bg-gray-100 px-4 pt-4">
@@ -263,6 +284,101 @@ export default function OrderDetail() {
               {new Date(transaction.createdAt).toLocaleString("vi-VN")}
             </Text>
           </Text>
+        </View>
+      )}
+
+      {detailOrder.trip && (
+        <View className="bg-white p-4 rounded-xl shadow mb-4">
+          <Text className="text-base font-semibold text-gray-800 mb-3">
+            Thông tin chuyến đi
+          </Text>
+
+          {/* Thời gian */}
+          <Text className="text-sm text-gray-600">
+            Dự kiến:{" "}
+            <Text className="text-gray-800 font-medium">
+              {new Date(detailOrder.trip.dueTime).toLocaleString("vi-VN")}
+            </Text>
+          </Text>
+          {detailOrder.trip.startTime && (
+            <Text className="text-sm text-gray-600 mt-1">
+              Bắt đầu:{" "}
+              <Text className="text-gray-800 font-medium">
+                {new Date(detailOrder.trip.startTime).toLocaleString("vi-VN")}
+              </Text>
+            </Text>
+          )}
+          {detailOrder.trip.endTime && (
+            <Text className="text-sm text-gray-600 mt-1">
+              Kết thúc:{" "}
+              <Text className="text-gray-800 font-medium">
+                {new Date(detailOrder.trip.endTime).toLocaleString("vi-VN")}
+              </Text>
+            </Text>
+          )}
+
+          {/* Thông tin tài xế */}
+          {detailOrder.trip.driver && (
+            <View className="mt-4">
+              <Text className="text-sm font-semibold text-gray-700 mb-1">
+                Tài xế
+              </Text>
+              <Text className="text-sm text-gray-800">
+                Họ tên:{" "}
+                <Text className="font-medium">
+                  {detailOrder.trip.driver.fullName}
+                </Text>
+              </Text>
+              <Text className="text-sm text-gray-800 mt-1">
+                Số điện thoại:{" "}
+                <Text className="font-medium">
+                  {detailOrder.trip.driver.phoneNumber}
+                </Text>
+              </Text>
+              <Text className="text-sm text-gray-800 mt-1">
+                Bằng lái:{" "}
+                <Text className="font-medium">
+                  {detailOrder.trip.driver.licenseNumber}
+                </Text>
+              </Text>
+              <TouchableOpacity
+                className="bg-blue-600 px-4 py-2 rounded-xl mt-3 w-fit self-start"
+                onPress={() => handleChat(detailOrder.trip?.driver?.accountID)}
+              >
+                <Text className="text-white font-semibold">
+                  Liên lạc tài xế
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Thông tin phương tiện */}
+          {detailOrder.trip.vehicle && (
+            <View className="mt-4">
+              <Text className="text-sm font-semibold text-gray-700 mb-1">
+                Phương tiện
+              </Text>
+              <Text className="text-sm text-gray-800">
+                Biển số:{" "}
+                <Text className="font-medium">
+                  {detailOrder.trip.vehicle.vehicleNumber}
+                </Text>
+              </Text>
+              <Text className="text-sm text-gray-800 mt-1">
+                Tải trọng:{" "}
+                <Text className="font-medium">
+                  {detailOrder.trip.vehicle.loadCapacity} kg
+                </Text>
+              </Text>
+              {detailOrder.trip.vehicle.vehicleImage && (
+                <Image
+                  source={{ uri: detailOrder.trip.vehicle.vehicleImage }}
+                  className="w-full h-40 mt-2 rounded-lg"
+                  resizeMode="cover"
+                />
+              )}
+            </View>
+          )}
         </View>
       )}
 

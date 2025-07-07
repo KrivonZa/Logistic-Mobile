@@ -12,6 +12,7 @@ import "react-native-reanimated";
 import ReduxProvider from "@/app/provider";
 import { AuthProvider } from "@/libs/context/AuthContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { createSocket } from "@/libs/thirdParty/socket/socket";
 
 import "../global.css";
 
@@ -30,6 +31,18 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
+
+      (async () => {
+        try {
+          const socketInstance = await createSocket();
+
+          socketInstance.on("connect", () => {
+            console.log("🔌 Socket connected:", socketInstance.id);
+          });
+        } catch (err) {
+          console.error("❌ Failed to connect socket:", err);
+        }
+      })();
     }
   }, [loaded]);
 
