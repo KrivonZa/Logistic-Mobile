@@ -1,3 +1,11 @@
+name: Build and Deploy with EAS
+
+# Sự kiện trigger workflow
+on:
+  push:
+    branches:
+      - master # Chạy khi có commit lên nhánh chính
+
 jobs:
   build:
     runs-on: ubuntu-latest
