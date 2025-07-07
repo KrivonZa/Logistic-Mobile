@@ -1,25 +1,17 @@
-name: Build and Deploy with EAS
-
-# Sự kiện trigger workflow
-on:
-  push:
-    branches:
-      - master # Chạy khi có commit lên nhánh chính
-
 jobs:
   build:
-    runs-on: ubuntu-latest # Chạy trên môi trường Linux
+    runs-on: ubuntu-latest
 
     steps:
       # Step 1: Checkout mã nguồn từ GitHub
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Cài đặt Node.js
+      # Step 2: Cài đặt Node.js phiên bản 20
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "20" # Chọn phiên bản Node.js bạn đang dùng
+          node-version: "20"  # Sử dụng Node.js v20
 
       # Step 3: Cài đặt dependencies
       - name: Install dependencies
@@ -27,10 +19,12 @@ jobs:
           npm install
           npm install -g eas-cli@latest
 
-      # Step 4: Login vào Expo (dùng token của bạn)
+      # Step 4: Đăng nhập vào Expo bằng token (thông qua biến môi trường)
       - name: Login to EAS
-        run: eas login --token ${{ secrets.EXPO_ACCESS_TOKEN }} # Lưu token Expo vào GitHub Secrets
+        run: eas login
+        env:
+          EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}  # Sử dụng token từ GitHub Secrets
 
       # Step 5: Chạy lệnh build
       - name: Run EAS build
-        run: eas build --platform android --profile production # Hoặc profile khác nếu cần
+        run: eas build --platform android --profile production
