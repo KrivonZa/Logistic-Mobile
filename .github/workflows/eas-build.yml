@@ -32,9 +32,9 @@ jobs:
             echo "✅ EXPO_ACCESS_TOKEN found"
           fi
         env:
-          EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
+          EXPO_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
 
       - name: 🚀 Run EAS Build (Android)
         run: eas build --platform android --profile production --non-interactive
         env:
-          EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
+          EXPO_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
