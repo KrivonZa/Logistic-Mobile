@@ -25,11 +25,11 @@ jobs:
 
       - name: 🔐 Check EXPO_ACCESS_TOKEN is available
         run: |
-          if [ -z "${EXPO_ACCESS_TOKEN}" ]; then
-            echo "❌ Missing EXPO_ACCESS_TOKEN"
+          if [ -z "${EXPO_TOKEN}" ]; then
+            echo "❌ Missing EXPO_TOKEN"
             exit 1
           else
-            echo "✅ EXPO_ACCESS_TOKEN found"
+            echo "✅ EXPO_TOKEN found"
           fi
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
