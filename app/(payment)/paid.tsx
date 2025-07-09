@@ -10,10 +10,12 @@ export default function Paid() {
 
   const handleRedirect = (url: string) => {
     if (
-      url.startsWith("https://www.google.com/") ||
-      url.startsWith("https://vi.wikipedia.org/")
+      url.startsWith("https://flipship-management.vercel.app/success") ||
+      url.startsWith("https://flipship-management.vercel.app/failed")
     ) {
-      router.replace("/(tabs)/order");
+      setTimeout(() => {
+        router.replace("/(tabs)/order");
+      }, 5000);
     }
   };
 
