@@ -84,8 +84,7 @@ export default function RegisterScreen() {
   const onSubmit = async (data: FormData) => {
     const { confirmPassword, ...payload } = data;
     try {
-      const result = await dispatch(register(payload)).unwrap();
-      console.log(result);
+      await dispatch(register(payload)).unwrap();
       Alert.alert("Thành công", "Đăng ký tài khoản thành công!");
       setTimeout(() => {
         router.push("/login");

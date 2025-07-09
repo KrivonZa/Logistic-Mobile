@@ -79,7 +79,6 @@ export default function OrderDetail() {
     const socket = await getSocket(); // 👈 GIỐNG như trong MessageScreen
 
     if (!socket.connected) {
-      console.warn("⚠️ Socket chưa kết nối");
       return;
     }
 

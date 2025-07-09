@@ -56,14 +56,8 @@ export default function CreatePackage() {
       name: image.fileName || "photo.jpg",
     } as any);
 
-    console.log("🧾 File chuẩn bị gửi:", {
-      uri: image.uri,
-      type: image.type,
-      name: image.fileName,
-    });
-
     try {
-      const result = await dispatch(createPackage(formData)).unwrap();
+      await dispatch(createPackage(formData)).unwrap();
       Alert.alert(
         "Thành công",
         "Đã tạo kiện hàng thành công",

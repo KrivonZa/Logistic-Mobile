@@ -33,7 +33,6 @@ export default function YourPackageScreen() {
   const safePackages = useMemo(() => packages || [], [packages]);
 
   const fetchPackages = async (pageNum: number) => {
-    console.log("Fetching packages for page:", pageNum, "routeID:", route);
     setIsFetchingMore(pageNum !== 1);
     try {
       const result = await dispatch(
@@ -42,8 +41,7 @@ export default function YourPackageScreen() {
       if (!result.data.data || safePackages.length >= result.data.total) {
         setHasMore(false);
       }
-    } catch (error) {
-      console.error("Error fetching packages:", error);
+    } catch {
       setHasMore(false);
     } finally {
       setIsFetchingMore(false);
@@ -53,11 +51,9 @@ export default function YourPackageScreen() {
 
   useEffect(() => {
     if (!route) {
-      console.warn("routeID is empty or invalid:", route);
       setHasMore(false);
       return;
     }
-    console.log("useEffect triggered, routeID:", route);
     setPage(1);
     setHasMore(true);
     dispatch(managePackageActions.resetPackages());
@@ -65,7 +61,6 @@ export default function YourPackageScreen() {
   }, [routeID, dispatch]);
 
   const onRefresh = () => {
-    console.log("Pull-to-refresh triggered");
     setIsRefreshing(true);
     setPage(1);
     setHasMore(true);
@@ -75,20 +70,10 @@ export default function YourPackageScreen() {
 
   const handleLoadMore = () => {
     if (!isFetchingMore && hasMore && safePackages.length > 0) {
-      console.log("handleLoadMore triggered", {
-        page,
-        hasMore,
-        isFetchingMore,
-      });
       const nextPage = page + 1;
       setPage(nextPage);
       fetchPackages(nextPage);
     } else {
-      console.warn("handleLoadMore skipped", {
-        hasMore,
-        isFetchingMore,
-        loading, // chỉ log thôi, không check điều kiện
-      });
     }
   };
 

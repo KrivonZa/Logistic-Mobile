@@ -102,15 +102,14 @@ export default function UpdateProfileScreen() {
 
       await dispatch(updateAccount(formData)).unwrap();
 
-      Alert.alert("✅ Thành công", "Thông tin đã được cập nhật.", [
+      Alert.alert("Thành công", "Thông tin đã được cập nhật.", [
         {
           text: "OK",
           onPress: () => router.back(),
         },
       ]);
-    } catch (err) {
-      console.error(err);
-      Alert.alert("❌ Lỗi", "Không thể cập nhật thông tin.");
+    } catch {
+      Alert.alert("Lỗi", "Không thể cập nhật thông tin.");
     } finally {
       setSubmitting(false);
     }

@@ -66,8 +66,7 @@ export default function TwoPointSearchScreen(): JSX.Element {
         longitude: lng,
       }));
       setRouteCoords(decoded);
-    } catch (error) {
-      console.error("Lỗi vẽ tuyến đường:", error);
+    } catch {
       Alert.alert("Lỗi", "Không thể lấy tuyến đường. Vui lòng thử lại.");
     }
   };

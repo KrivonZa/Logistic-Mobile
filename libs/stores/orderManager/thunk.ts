@@ -9,7 +9,6 @@ export const createOrderDelivery = createAsyncThunk(
       const response = await manageOrder.createOrder(req);
       return response.data;
     } catch (error: any) {
-      console.log(error);
       const message =
         error.response?.data?.message || error.message || "Đã xảy ra lỗi";
       return rejectWithValue(message);
@@ -55,7 +54,6 @@ export const detailOrderDelivery = createAsyncThunk(
       const response = await manageOrder.getOrderDetail(req);
       return response.data;
     } catch (error: any) {
-      console.log(error);
       const message =
         error.response?.data?.message || error.message || "Đã xảy ra lỗi";
       return rejectWithValue(message);

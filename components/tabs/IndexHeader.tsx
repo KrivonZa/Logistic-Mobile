@@ -9,6 +9,7 @@ import {
   Dimensions,
   TextInput,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
@@ -78,13 +79,15 @@ const AnimatedHeader: React.FC<Props> = ({ scrollY }) => {
     extrapolate: "clamp",
   });
 
-  const handleSearchPress = () => {
-    router.push("/(search)");
-  };
+  // const handleSearchPress = () => {
+  //   router.push("/(search)");
+  // };
 
   const handleScanPress = () => {
-    console.log("Scan được nhấn!");
-    // router.push("/(scan)");
+    Alert.alert(
+      "Tính năng tương lai",
+      "Tính năng sẽ được cập nhật trong thời gian sắp tới"
+    );
   };
 
   return (

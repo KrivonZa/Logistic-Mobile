@@ -47,9 +47,8 @@ export default function RatingScreen() {
           },
         },
       ]);
-    } catch (err) {
+    } catch {
       Alert.alert("Lỗi", "Không thể gửi đánh giá. Vui lòng thử lại sau.");
-      console.error("Error sending rating:", err);
     }
   };
 
@@ -60,9 +59,6 @@ export default function RatingScreen() {
           <Image
             source={require("@/assets/images/transparent-icon-blue.png")}
             className="w-24 h-24 rounded-full object-cover border-4 border-primary/80"
-            onError={(e) =>
-              console.log("Image loading error:", e.nativeEvent.error)
-            }
           />
         </View>
 

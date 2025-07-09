@@ -24,7 +24,6 @@ export const getTripByDriver = createAsyncThunk(
       });
       return response.data;
     } catch (error: any) {
-      console.error(error);
       const message =
         error.response?.data?.message || error.message || "Đã xảy ra lỗi";
       return rejectWithValue(message);

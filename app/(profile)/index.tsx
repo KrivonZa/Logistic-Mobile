@@ -27,7 +27,6 @@ export default function ProfileScreen() {
           <TouchableOpacity
             className="absolute top-0 right-0 bg-gray-100 p-2 rounded-full shadow-sm z-10"
             onPress={() => {
-              console.log("Go to edit");
               router.push("/edit");
             }}
           >

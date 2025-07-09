@@ -23,7 +23,6 @@ export const getSocket = async (): Promise<Socket> => {
 
   return new Promise((resolve) => {
     socketInstance?.on("connect", () => {
-      console.log("✅ Socket connected:", socketInstance?.id);
       resolve(socketInstance!);
     });
   });

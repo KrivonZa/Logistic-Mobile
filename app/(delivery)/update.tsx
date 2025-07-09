@@ -78,7 +78,6 @@ export default function UpdateTripStatusScreen() {
         },
       ]);
     } catch (err: any) {
-      console.error("Lỗi cập nhật:", err);
       Alert.alert("Thất bại", "Không thể cập nhật hình ảnh.");
     } finally {
       setLoading(false);

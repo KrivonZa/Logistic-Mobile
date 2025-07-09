@@ -47,9 +47,7 @@ export default function SearchScreen(): JSX.Element {
       if (existing) {
         setRecentSearches(JSON.parse(existing));
       }
-    } catch (error) {
-      console.error("Lỗi khi load lịch sử:", error);
-    }
+    } catch {}
   };
 
   const updateRecentSearches = async (newSearch: RecentSearch) => {
@@ -65,9 +63,7 @@ export default function SearchScreen(): JSX.Element {
 
       await AsyncStorage.setItem("recent_searches", JSON.stringify(updated));
       setRecentSearches(updated);
-    } catch (error) {
-      console.error("Lỗi khi cập nhật lịch sử:", error);
-    }
+    } catch {}
   };
 
   useEffect(() => {
@@ -86,9 +82,7 @@ export default function SearchScreen(): JSX.Element {
         }
       );
       setSuggestions(response.data.predictions || []);
-    } catch (error) {
-      console.error("Lỗi khi lấy gợi ý:", error);
-    }
+    } catch {}
   };
 
   const debouncedFetch = useRef(debounce(fetchSuggestions, 200)).current;

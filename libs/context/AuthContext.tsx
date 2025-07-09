@@ -76,8 +76,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const res = await api.get<User>("/account");
 
           setUser(res.data);
-        } catch (err) {
-          console.error("Failed to fetch user:", err);
+        } catch {
           await logout();
         }
       } else {

@@ -67,7 +67,6 @@ export default function DeliveryDetail() {
     const socket = await getSocket();
 
     if (!socket.connected) {
-      console.warn("⚠️ Socket chưa kết nối");
       return;
     }
 

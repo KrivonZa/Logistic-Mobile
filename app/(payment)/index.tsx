@@ -162,11 +162,9 @@ export default function CheckoutScreen() {
           durationText: leg.duration.text,
         };
       } else {
-        console.warn("Không lấy được dữ liệu khoảng cách");
         return null;
       }
-    } catch (error) {
-      console.error("Lỗi khi gọi Goong API:", error);
+    } catch {
       return null;
     }
   };

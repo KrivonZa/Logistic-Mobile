@@ -12,7 +12,7 @@ import "react-native-reanimated";
 import ReduxProvider from "@/app/provider";
 import { AuthProvider } from "@/libs/context/AuthContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { createSocket } from "@/libs/thirdParty/socket/socket";
+import { getSocket } from "@/libs/thirdParty/socket/socket";
 
 import "../global.css";
 
@@ -34,11 +34,9 @@ export default function RootLayout() {
 
       (async () => {
         try {
-          const socketInstance = await createSocket();
+          const socketInstance = await getSocket();
 
-          socketInstance.on("connect", () => {
-            console.log("🔌 Socket connected:", socketInstance.id);
-          });
+          socketInstance.on("connect", () => {});
         } catch {}
       })();
     }
