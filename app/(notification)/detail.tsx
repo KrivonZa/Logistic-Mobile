@@ -2,8 +2,9 @@ import React from "react";
 import { Text, View, StatusBar, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import isAuth from "@/components/isAuth";
 
-export default function DetailScreen() {
+const DetailScreen = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
 
@@ -74,4 +75,6 @@ export default function DetailScreen() {
       </View>
     </View>
   );
-}
+};
+
+export default isAuth(DetailScreen, ["Customer", "Driver"]);

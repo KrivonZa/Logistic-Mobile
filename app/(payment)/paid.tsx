@@ -1,8 +1,9 @@
 import { useLocalSearchParams, router } from "expo-router";
 import { WebView } from "react-native-webview";
 import { View } from "react-native";
+import isAuth from "@/components/isAuth";
 
-export default function Paid() {
+const Paid = () => {
   const { checkoutUrl, orderID } = useLocalSearchParams<{
     checkoutUrl: string;
     orderID: string;
@@ -30,4 +31,6 @@ export default function Paid() {
       />
     </View>
   );
-}
+};
+
+export default isAuth(Paid, ["Customer"]);

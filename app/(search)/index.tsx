@@ -14,6 +14,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import axios from "axios";
 import debounce from "lodash/debounce";
+import isAuth from "@/components/isAuth";
 
 type RecentSearch = {
   description: string;
@@ -23,7 +24,7 @@ type RecentSearch = {
   };
 };
 
-export default function SearchScreen(): JSX.Element {
+const SearchScreen = (): JSX.Element => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -306,4 +307,6 @@ export default function SearchScreen(): JSX.Element {
       </ScrollView>
     </View>
   );
-}
+};
+
+export default isAuth(SearchScreen, ["Customer"]);

@@ -14,8 +14,9 @@ import { createRating } from "@/libs/stores/ratingManager/thunk";
 import { useRating } from "@/libs/hooks/useRating";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/libs/context/AuthContext";
+import isAuth from "@/components/isAuth";
 
-export default function RatingScreen() {
+const RatingScreen = () => {
   const [stars, setStars] = useState(0);
   const [content, setContent] = useState("");
   const { loading } = useRating();
@@ -113,4 +114,6 @@ export default function RatingScreen() {
       </View>
     </View>
   );
-}
+};
+
+export default isAuth(RatingScreen, ["Customer", "Driver"]);

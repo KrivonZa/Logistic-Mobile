@@ -12,8 +12,9 @@ import { useAppDispatch } from "@/libs/stores";
 import { detailOrderDelivery } from "@/libs/stores/orderManager/thunk";
 import { useOrder } from "@/libs/hooks/useOrder";
 import { getSocket } from "@/libs/thirdParty/socket/socket";
+import isAuth from "@/components/isAuth";
 
-export default function OrderDetail() {
+const OrderDetail = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -394,4 +395,6 @@ export default function OrderDetail() {
       </View>
     </ScrollView>
   );
-}
+};
+
+export default isAuth(OrderDetail, ["Customer"]);

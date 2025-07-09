@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import TripStatusUpdater from "@/components/driver/TripAction";
 import { useRouter } from "expo-router";
 import { getSocket } from "@/libs/thirdParty/socket/socket";
+import isAuth from "@/components/isAuth";
 
 interface InfoCardProps {
   title: string;
@@ -28,7 +29,7 @@ const InfoCard = ({ title, children }: InfoCardProps) => (
   </View>
 );
 
-export default function DeliveryDetail() {
+const DeliveryDetail = () => {
   const dispatch = useAppDispatch();
   const { loading, tripDetail } = useTrip();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -242,4 +243,6 @@ export default function DeliveryDetail() {
       <View className="h-4" />
     </ScrollView>
   );
-}
+};
+
+export default isAuth(DeliveryDetail, ["Driver"]);

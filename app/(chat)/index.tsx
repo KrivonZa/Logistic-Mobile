@@ -10,8 +10,9 @@ import { useAppDispatch } from "@/libs/stores";
 import { clearConversation } from "@/libs/stores/chatManager/slice";
 import { useAuth } from "@/libs/context/AuthContext";
 import { Conversations } from "@/libs/types/chat";
+import isAuth from "@/components/isAuth";
 
-export default function ConversationListScreen() {
+const ConversationListScreen = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { loading, conversations } = useChat();
@@ -92,4 +93,6 @@ export default function ConversationListScreen() {
       />
     </View>
   );
-}
+};
+
+export default isAuth(ConversationListScreen, ["Customer", "Driver"]);

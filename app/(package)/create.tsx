@@ -15,8 +15,9 @@ import { useAppDispatch } from "@/libs/stores";
 import { createPackage } from "@/libs/stores/packageManager/thunk";
 import { usePackage } from "@/libs/hooks/usePackage";
 import { useRouter } from "expo-router";
+import isAuth from "@/components/isAuth";
 
-export default function CreatePackage() {
+const CreatePackage = () => {
   const dispatch = useAppDispatch();
   const { loading } = usePackage();
 
@@ -149,4 +150,6 @@ export default function CreatePackage() {
       </TouchableOpacity>
     </ScrollView>
   );
-}
+};
+
+export default isAuth(CreatePackage, ["Customer"]);

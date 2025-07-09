@@ -13,8 +13,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useAppDispatch } from "@/libs/stores";
 import { updateTrip } from "@/libs/stores/tripManager/thunk";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import isAuth from "@/components/isAuth";
 
-export default function UpdateTripStatusScreen() {
+const UpdateTripStatusScreen = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { tripID, status } = useLocalSearchParams<{
@@ -140,4 +141,6 @@ export default function UpdateTripStatusScreen() {
       </TouchableOpacity>
     </ScrollView>
   );
-}
+};
+
+export default isAuth(UpdateTripStatusScreen, ["Driver"]);

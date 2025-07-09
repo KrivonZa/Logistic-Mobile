@@ -20,6 +20,7 @@ import { useAppDispatch } from "@/libs/stores";
 import { useRoute } from "@/libs/hooks/useRoute";
 import { findNearest } from "@/libs/stores/routeManager/thunk";
 import { FindNearestWaypointsRequest } from "@/libs/types/route";
+import isAuth from "@/components/isAuth";
 
 const { width, height } = Dimensions.get("window");
 const LATITUDE_DELTA = 0.01;
@@ -30,7 +31,7 @@ interface LatLng {
   longitude: number;
 }
 
-export default function TwoPointSearchScreen(): JSX.Element {
+const TwoPointSearchScreen = (): JSX.Element => {
   const { lat, lng, description } = useLocalSearchParams();
 
   const [currentCoords, setCurrentCoords] = useState<LatLng | null>(null);
@@ -250,4 +251,6 @@ export default function TwoPointSearchScreen(): JSX.Element {
       </MapView>
     </View>
   );
-}
+};
+
+export default isAuth(TwoPointSearchScreen, ["Customer"]);

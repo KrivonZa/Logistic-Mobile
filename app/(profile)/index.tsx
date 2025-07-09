@@ -4,8 +4,9 @@ import { useRouter } from "expo-router";
 import { useUser } from "@/libs/context/AuthContext";
 import { DriverDetail, CustomerDetail } from "@/libs/types/account";
 import dayjs from "dayjs";
+import isAuth from "@/components/isAuth";
 
-export default function ProfileScreen() {
+const ProfileScreen = () => {
   const user = useUser();
   if (!user) return null;
   const router = useRouter();
@@ -110,7 +111,9 @@ export default function ProfileScreen() {
       </View>
     </ScrollView>
   );
-}
+};
+
+export default isAuth(ProfileScreen, ["Customer", "Driver"]);
 
 // Component hàng thông tin
 const InfoRow = ({

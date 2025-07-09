@@ -11,8 +11,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRoute } from "@/libs/hooks/useRoute";
 import type { RouteWithWaypoints } from "@/libs/types/route";
+import isAuth from "@/components/isAuth";
 
-export default function ResultScreen() {
+const ResultScreen = () => {
   const { fromLocation, toLocation } = useLocalSearchParams();
   const router = useRouter();
   const { routes } = useRoute();
@@ -101,4 +102,6 @@ export default function ResultScreen() {
       />
     </View>
   );
-}
+};
+
+export default isAuth(ResultScreen, ["Customer"]);

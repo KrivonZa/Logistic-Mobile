@@ -18,8 +18,9 @@ import {
   updatePackage,
 } from "@/libs/stores/packageManager/thunk";
 import { usePackage } from "@/libs/hooks/usePackage";
+import isAuth from "@/components/isAuth";
 
-export default function UpdatePackageScreen() {
+const UpdatePackageScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const { packageDetail, loading } = usePackage();
@@ -174,4 +175,6 @@ export default function UpdatePackageScreen() {
       </TouchableOpacity>
     </ScrollView>
   );
-}
+};
+
+export default isAuth(UpdatePackageScreen, ["Customer"]);

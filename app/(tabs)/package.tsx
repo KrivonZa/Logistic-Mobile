@@ -17,6 +17,7 @@ import { useAppDispatch } from "@/libs/stores";
 import { getAllPackageByCustomer } from "@/libs/stores/packageManager/thunk";
 import { managePackageActions } from "@/libs/stores/packageManager/slice";
 import { useAuth } from "@/libs/context/AuthContext";
+import isAuth from "@/components/isAuth";
 
 const FILTERS = [
   { label: "Tất cả", value: null },
@@ -27,7 +28,7 @@ const FILTERS = [
   { label: "Đã hủy", value: "canceled" },
 ];
 
-export default function YourPackageScreen() {
+const YourPackageScreen = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { packages, loading } = usePackage();
@@ -240,4 +241,6 @@ export default function YourPackageScreen() {
       )}
     </View>
   );
-}
+};
+
+export default isAuth(YourPackageScreen, ["Customer"]);

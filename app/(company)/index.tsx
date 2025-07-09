@@ -12,6 +12,7 @@ import { RouteWithWaypoints } from "@/libs/types/route";
 import { useAppDispatch } from "@/libs/stores";
 import { getRouteByID } from "@/libs/stores/routeManager/thunk";
 import { useAuth } from "@/libs/context/AuthContext";
+import isAuth from "@/components/isAuth";
 
 // Interfaces for Goong Maps API response
 interface GoongRoute {
@@ -24,7 +25,7 @@ interface GoongDirectionsResponse {
   routes: GoongRoute[];
 }
 
-export default function CompanyDetailWithSheet() {
+const CompanyDetailWithSheet = () => {
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["12%", "50%", "80%"], []);
   const [activeTab, setActiveTab] = useState<"route" | "schedule">("route");
@@ -416,7 +417,9 @@ export default function CompanyDetailWithSheet() {
       )}
     </View>
   );
-}
+};
+
+export default isAuth(CompanyDetailWithSheet, ["Customer"]);
 
 const mockSchedules = {
   go: [

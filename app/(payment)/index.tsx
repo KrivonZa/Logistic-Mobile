@@ -21,9 +21,10 @@ import ImageModalViewer from "@/components/images/ImageZoomView";
 import { useAppDispatch } from "@/libs/stores";
 import { getPackageByID } from "@/libs/stores/packageManager/thunk";
 import { createOrderDelivery } from "@/libs/stores/orderManager/thunk";
+import isAuth from "@/components/isAuth";
 import priceTable from "@/price.json";
 
-export default function CheckoutScreen() {
+const CheckoutScreen = () => {
   const dispatch = useAppDispatch();
   const { packageID, companyName, companyID } = useAuth();
   const router = useRouter();
@@ -456,4 +457,6 @@ export default function CheckoutScreen() {
       />
     </SafeAreaView>
   );
-}
+};
+
+export default isAuth(CheckoutScreen, ["Customer"]);

@@ -25,10 +25,11 @@ import { useChat } from "@/libs/hooks/useChat";
 
 import ChatHeader from "@/components/chat/ChatHeader";
 import MessageList from "@/components/chat/MessageList";
+import isAuth from "@/components/isAuth";
 
 import dayjs from "dayjs";
 
-export default function MessageScreen() {
+const MessageScreen = () => {
   const dispatch = useAppDispatch();
   const { id, senderID, receiverID } = useLocalSearchParams();
   const { messages } = useChat();
@@ -198,4 +199,6 @@ export default function MessageScreen() {
       </View>
     </KeyboardAvoidingView>
   );
-}
+};
+
+export default isAuth(MessageScreen, ["Customer", "Driver"]);

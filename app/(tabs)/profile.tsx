@@ -9,8 +9,9 @@ import {
 import { Link } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useAuth } from "@/libs/context/AuthContext";
+import isAuth from "@/components/isAuth";
 
-export default function ProfileScreen() {
+const ProfileScreen = () => {
   const { logout, user } = useAuth();
 
   return (
@@ -114,4 +115,6 @@ export default function ProfileScreen() {
       </View>
     </ScrollView>
   );
-}
+};
+
+export default isAuth(ProfileScreen, ["Customer"]);

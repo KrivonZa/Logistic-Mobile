@@ -16,8 +16,9 @@ import { useAppDispatch } from "@/libs/stores";
 import { getPackageIdleByCustomer } from "@/libs/stores/packageManager/thunk";
 import { managePackageActions } from "@/libs/stores/packageManager/slice";
 import { useAuth } from "@/libs/context/AuthContext";
+import isAuth from "@/components/isAuth";
 
-export default function YourPackageScreen() {
+const YourPackageScreen = () => {
   const { routeID, setPackageID } = useAuth();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -185,4 +186,6 @@ export default function YourPackageScreen() {
       />
     </View>
   );
-}
+};
+
+export default isAuth(YourPackageScreen, ["Customer"]);

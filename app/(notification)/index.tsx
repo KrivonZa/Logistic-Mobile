@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import isAuth from "@/components/isAuth";
 
 interface Notification {
   id: string;
@@ -19,7 +20,7 @@ interface Notification {
   iconColor: string;
 }
 
-export default function NotificationScreen() {
+const NotificationScreen = () => {
   const router = useRouter();
 
   const dummyNotifications: Notification[] = [
@@ -136,4 +137,6 @@ export default function NotificationScreen() {
       />
     </View>
   );
-}
+};
+
+export default isAuth(NotificationScreen, ["Customer", "Driver"]);

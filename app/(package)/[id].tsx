@@ -13,8 +13,9 @@ import { useAppDispatch } from "@/libs/stores";
 import { getPackageByID } from "@/libs/stores/packageManager/thunk";
 import { usePackage } from "@/libs/hooks/usePackage";
 import { useRouter } from "expo-router";
+import isAuth from "@/components/isAuth";
 
-export default function ItemDetailScreen() {
+const ItemDetailScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const { packageDetail } = usePackage();
@@ -171,7 +172,7 @@ export default function ItemDetailScreen() {
       </ScrollView>
     </View>
   );
-}
+};
 
 interface DetailRowProps {
   icon: string;
@@ -191,3 +192,5 @@ const DetailRow: React.FC<DetailRowProps> = ({ icon, label, value }) => (
     <Text className="text-gray-800 flex-1">{value}</Text>
   </View>
 );
+
+export default isAuth(ItemDetailScreen, ["Customer"]);

@@ -12,6 +12,7 @@ import { useAppDispatch } from "@/libs/stores";
 import { getCreatedOrderDelivery } from "@/libs/stores/orderManager/thunk";
 import { useOrder } from "@/libs/hooks/useOrder";
 import { useRouter } from "expo-router";
+import isAuth from "@/components/isAuth";
 
 const STATUS_OPTIONS = [
   { label: "Tất cả", value: undefined },
@@ -25,7 +26,7 @@ const STATUS_OPTIONS = [
   { label: "Đã hủy", value: "canceled" },
 ];
 
-export default function OrderScreen() {
+const OrderScreen = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { loading, orderDeliveries, page, total } = useOrder();
@@ -247,4 +248,6 @@ export default function OrderScreen() {
       )}
     </View>
   );
-}
+};
+
+export default isAuth(OrderScreen, ["Customer"]);

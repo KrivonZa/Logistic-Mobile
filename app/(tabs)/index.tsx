@@ -11,6 +11,7 @@ import {
 import AnimatedHeader from "@/components/tabs/IndexHeader";
 import YourLocation from "@/components/tabs/YourLocation";
 import { useRouter } from "expo-router";
+import isAuth from "@/components/isAuth";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const HEADER_MAX_HEIGHT = SCREEN_HEIGHT / 3.5;
@@ -91,4 +92,4 @@ const HomeScreen = () => {
   );
 };
 
-export default HomeScreen;
+export default isAuth(HomeScreen, ["Customer"]);

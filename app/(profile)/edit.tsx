@@ -17,8 +17,9 @@ import { useAppDispatch } from "@/libs/stores";
 import { updateAccount } from "@/libs/stores/accountManager/thunk";
 import { useAccount } from "@/libs/hooks/useAccount";
 import { useRouter } from "expo-router";
+import isAuth from "@/components/isAuth";
 
-export default function UpdateProfileScreen() {
+const UpdateProfileScreen = () => {
   const user = useUser();
   if (!user) return null;
   const router = useRouter();
@@ -203,7 +204,7 @@ export default function UpdateProfileScreen() {
       </TouchableOpacity>
     </ScrollView>
   );
-}
+};
 
 // Reusable input
 const LabelInput = ({
@@ -235,3 +236,5 @@ const LabelInput = ({
     />
   </View>
 );
+
+export default isAuth(UpdateProfileScreen, ["Customer", "Driver"]);

@@ -18,8 +18,9 @@ import { format } from "date-fns";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import TripStatusUpdater from "@/components/driver/TripAction";
+import isAuth from "@/components/isAuth";
 
-export default function TripListScreen() {
+const TripListScreen = () => {
   const dispatch = useAppDispatch();
   const { user } = useAuth();
   const { trips, loading, total } = useTrip();
@@ -283,4 +284,6 @@ export default function TripListScreen() {
       )}
     </View>
   );
-}
+};
+
+export default isAuth(TripListScreen, ["Driver"]);
