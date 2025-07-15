@@ -1,32 +1,28 @@
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Image, View } from "react-native";
 import * as SecureStore from "expo-secure-store";
 
 export default function Index() {
   const router = useRouter();
-  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const checkTokenAndNavigate = async () => {
       const storedToken = await SecureStore.getItemAsync("authToken");
       const role = await SecureStore.getItemAsync("role");
+
+      // Nếu đã đăng nhập, redirect đến khu vực tương ứng
       if (storedToken) {
         if (role === "Customer") {
-          router.push("/(tabs)");
+          router.replace("/(tabs)");
         } else if (role === "Driver") {
-          router.push("/(driver)");
+          router.replace("/(driver)");
         }
       } else {
-        router.replace("/(auth)");
       }
     };
-    const timeout = setTimeout(() => {
-      setReady(true);
-      checkTokenAndNavigate();
-    }, 0);
 
-    return () => clearTimeout(timeout);
+    checkTokenAndNavigate();
   }, []);
 
   return (
