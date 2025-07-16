@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     load();
-  }, [pathname]);
+  }, []);
 
   const logout = async () => {
     await SecureStore.deleteItemAsync("authToken");
